@@ -1,17 +1,23 @@
 package com.magic.xmagichooker
 
+import android.app.ActivityManager
 import android.app.Application
 import android.content.Context
+import android.os.Process
+import android.text.TextUtils
 import android.util.Log
-import com.magic.kernel.MagicGlobal
 import com.magic.kernel.MagicHooker
-import de.robv.android.xposed.callbacks.XC_LoadPackage
 import com.magic.kernel.helper.TryHelper.tryVerbosely
 import com.magic.shared.apis.SharedEngine
+import com.magic.wechat.apis.WcEngine
 import com.magic.wework.apis.WwEngine
-import dalvik.system.PathClassLoader
-import de.robv.android.xposed.*
-import java.io.File
+import de.robv.android.xposed.IXposedHookLoadPackage
+import de.robv.android.xposed.IXposedHookZygoteInit
+import de.robv.android.xposed.XC_MethodHook
+import de.robv.android.xposed.XC_MethodReplacement
+import de.robv.android.xposed.XposedHelpers
+import de.robv.android.xposed.callbacks.XC_LoadPackage
+
 
 class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
 
@@ -69,8 +75,28 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
             }
             "com.tencent.mm" -> {
                 Log.e(Hooker::class.java.name, "开始启动个人微信插件")
+                val processName = getProcessName(MagicHooker.getSystemContext())
+                Log.e(Hooker::class.java.name, "processName:$processName")
+                if (TextUtils.equals("com.tencent.mm", processName)) {
+                    MagicHooker.startup(
+                        lpparam = lpparam,
+                        plugins = listOf(WechatPlugins),
+                        centers = WcEngine.hookerCenters + SharedEngine.hookerCenters
+                    )
+                }
             }
         }
     }
 
+    fun getProcessName(cxt: Context): String? {
+        val pid = Process.myPid()
+        val am = cxt.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val runningApps = am.runningAppProcesses ?: return null
+        for (procInfo in runningApps) {
+            if (procInfo.pid == pid) {
+                return procInfo.processName
+            }
+        }
+        return null
+    }
 }

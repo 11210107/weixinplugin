@@ -54,6 +54,7 @@ dependencies {
     implementation project(":kernel")
     implementation project(":shared")
     implementation project(":wework")
+    implementation project(":wechat")
     implementation 'com.google.code.gson:gson:2.8.6'
     compileOnly 'de.robv.android.xposed:api:82'
     compileOnly 'de.robv.android.xposed:api:82:sources'
@@ -62,9 +63,9 @@ dependencies {
 // 每次修改运行后自动让 VXP 中的模块`即时生效` ,需要将 (Debug Configurations) - Before Launch - Gradle aware Make - 修改为 :app:installDebug
 afterEvaluate {
     installDebug.doLast {
-        updateVirtualXposedAPP.execute()
-        rebootVirtualXposedAPP.execute()
-        launchVirtualXposedAPP.execute()
+//        updateVirtualXposedAPP.execute()
+//        rebootVirtualXposedAPP.execute()
+//        launchVirtualXposedAPP.execute()
     }
 }
 

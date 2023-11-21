@@ -24,10 +24,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (checkHook()) {
-            val path = MagicHooker.getApplicationApkPath("com.magic.xmagichooker")
-            sample_text.text = "hooked = true  \n  \n $path"
-        }
+//        if (checkHook()) {
+//            val path = MagicHooker.getApplicationApkPath("com.magic.xmagichooker")
+//            sample_text.text = "hooked = true  \n  \n $path"
+//        }
     }
 
     fun checkHook(): Boolean {

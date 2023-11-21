@@ -11,12 +11,14 @@ object Clazz {
     val Iterator = java.util.Iterator::class.java
     val Long = Long::class.java
     val Map = Map::class.java
+    val Set = Set::class.java
     val Object = Object::class.java
     val String = String::class.java
     val CharSequence = CharSequence::class.java
     val Throwable = Throwable::class.java
 
     val Activity = android.app.Activity::class.java
+    val Fragment = androidx.fragment.app.Fragment::class.java
     val AdapterView = android.widget.AdapterView::class.java
     val AdapterView_OnItemClickListener = android.widget.AdapterView.OnItemClickListener::class.java
     val AttributeSet = android.util.AttributeSet::class.java
@@ -41,6 +43,7 @@ object Clazz {
     val NotificationManager = android.app.NotificationManager::class.java
     val View = android.view.View::class.java
     val ViewGroup = android.view.ViewGroup::class.java
+    val LayoutInflater = android.view.LayoutInflater::class.java
 
     val Cursor = android.database.Cursor::class.java
 

@@ -3,11 +3,26 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/XMagicHooker.iml" filepath="$PROJECT_DIR$/XMagicHooker.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/kernel/kernel.iml" filepath="$PROJECT_DIR$/kernel/kernel.iml" />
-      <module fileurl="file://$PROJECT_DIR$/shared/shared.iml" filepath="$PROJECT_DIR$/shared/shared.iml" />
-      <module fileurl="file://$PROJECT_DIR$/wechat/wechat.iml" filepath="$PROJECT_DIR$/wechat/wechat.iml" />
-      <module fileurl="file://$PROJECT_DIR$/wework/wework.iml" filepath="$PROJECT_DIR$/wework/wework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/XMagicHooker.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/XMagicHooker.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/XMagicHooker.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/XMagicHooker.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/XMagicHooker.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/XMagicHooker.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/XMagicHooker.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/XMagicHooker.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kernel/XMagicHooker.kernel.iml" filepath="$PROJECT_DIR$/.idea/modules/kernel/XMagicHooker.kernel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kernel/XMagicHooker.kernel.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/kernel/XMagicHooker.kernel.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kernel/XMagicHooker.kernel.main.iml" filepath="$PROJECT_DIR$/.idea/modules/kernel/XMagicHooker.kernel.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/kernel/XMagicHooker.kernel.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/kernel/XMagicHooker.kernel.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/XMagicHooker.shared.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/XMagicHooker.shared.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/XMagicHooker.shared.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/XMagicHooker.shared.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/XMagicHooker.shared.main.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/XMagicHooker.shared.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/shared/XMagicHooker.shared.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/shared/XMagicHooker.shared.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wechat/XMagicHooker.wechat.iml" filepath="$PROJECT_DIR$/.idea/modules/wechat/XMagicHooker.wechat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wechat/XMagicHooker.wechat.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/wechat/XMagicHooker.wechat.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wechat/XMagicHooker.wechat.main.iml" filepath="$PROJECT_DIR$/.idea/modules/wechat/XMagicHooker.wechat.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wechat/XMagicHooker.wechat.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/wechat/XMagicHooker.wechat.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wework/XMagicHooker.wework.iml" filepath="$PROJECT_DIR$/.idea/modules/wework/XMagicHooker.wework.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wework/XMagicHooker.wework.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/wework/XMagicHooker.wework.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wework/XMagicHooker.wework.main.iml" filepath="$PROJECT_DIR$/.idea/modules/wework/XMagicHooker.wework.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/wework/XMagicHooker.wework.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/wework/XMagicHooker.wework.unitTest.iml" />
     </modules>
   </component>
 </project>
