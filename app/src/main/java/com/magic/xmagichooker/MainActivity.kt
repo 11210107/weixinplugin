@@ -19,7 +19,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        CmdUtil.isRoot
+        val isRoot = CmdUtil.isRoot
+        Log.d("Hooker","isRoot=$isRoot")
+        if (isRoot) {
+            sample_text.text = "hooked15 = true"
+        }
     }
 
     override fun onResume() {

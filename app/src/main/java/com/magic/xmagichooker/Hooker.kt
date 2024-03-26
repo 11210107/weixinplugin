@@ -24,6 +24,7 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
     private val TARGET_PACKAGE = "com.magic.xmagichooker"
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
+        Log.e(Hooker::class.java.name, "handleLoadPackage   ${lpparam.processName}")
         tryVerbosely {
             when (lpparam.packageName) {
                 TARGET_PACKAGE ->
@@ -65,6 +66,8 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
     }
 
     private fun hookTencent(lpparam: XC_LoadPackage.LoadPackageParam, context: Context) {
+        Log.e(Hooker::class.java.name, "lpparam.packageName:${lpparam.packageName}")
+        Log.e(Hooker::class.java.name, "lpparam.processName:${lpparam.processName}")
         when (lpparam.packageName) {
             "com.tencent.wework" -> {
                 MagicHooker.startup(
@@ -78,12 +81,13 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
                 val processName = getProcessName(MagicHooker.getSystemContext())
                 Log.e(Hooker::class.java.name, "processName:$processName")
                 if (TextUtils.equals("com.tencent.mm", processName)) {
-                    MagicHooker.startup(
-                        lpparam = lpparam,
-                        plugins = listOf(WechatPlugins),
-                        centers = WcEngine.hookerCenters + SharedEngine.hookerCenters
-                    )
+
                 }
+                MagicHooker.startup(
+                    lpparam = lpparam,
+                    plugins = listOf(WechatPlugins),
+                    centers = WcEngine.hookerCenters + SharedEngine.hookerCenters
+                )
             }
         }
     }

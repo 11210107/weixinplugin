@@ -22,6 +22,10 @@ object MagicHooker {
             !processName.contains(':') -> {
             }
             processName.endsWith(":tools") -> {
+                return true
+            }
+            processName.endsWith(":toolsmp") -> {
+                return true
             }
             else -> return false
         }
