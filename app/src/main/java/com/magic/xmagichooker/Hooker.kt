@@ -9,6 +9,7 @@ import android.util.Log
 import com.magic.kernel.MagicHooker
 import com.magic.kernel.helper.TryHelper.tryVerbosely
 import com.magic.shared.apis.SharedEngine
+import com.magic.wechat.apis.ByteDanceEngine
 import com.magic.wechat.apis.WcEngine
 import com.magic.wework.apis.WwEngine
 import de.robv.android.xposed.IXposedHookLoadPackage
@@ -17,11 +18,13 @@ import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
+import java.io.File
 
 
 class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     private val TARGET_PACKAGE = "com.magic.xmagichooker"
+    private val BYTE_DANCE_PACKAGE = "com.ss.android.ugc.aweme"
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
         Log.e(Hooker::class.java.name, "handleLoadPackage   ${lpparam.processName}")
@@ -31,6 +34,11 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
                     hookAttachBaseContext(lpparam.classLoader) {
                         hookLoadHooker(lpparam.classLoader)
                     }
+                BYTE_DANCE_PACKAGE ->
+//                    hookAttachBaseContext(lpparam.classLoader) {
+//
+//                    }
+                    hookByteDance(lpparam)
                 else -> if (MagicHooker.isImportantWechatProcess(lpparam)) {
                     hookAttachBaseContext(lpparam.classLoader) {
                         hookTencent(lpparam, it)
@@ -52,6 +60,7 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
             Context::class.java,
             object : XC_MethodHook() {
                 override fun afterHookedMethod(param: MethodHookParam?) {
+                    Log.e(Hooker::class.java.name, "hookAttachBaseContext callback")
                     callback(param?.thisObject as? Application ?: return)
                 }
             })
@@ -81,13 +90,34 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
                 val processName = getProcessName(MagicHooker.getSystemContext())
                 Log.e(Hooker::class.java.name, "processName:$processName")
                 if (TextUtils.equals("com.tencent.mm", processName)) {
-
+                    //主进程hook
                 }
                 MagicHooker.startup(
                     lpparam = lpparam,
                     plugins = listOf(WechatPlugins),
                     centers = WcEngine.hookerCenters + SharedEngine.hookerCenters
                 )
+            }
+        }
+    }
+
+    private fun hookByteDance(lpparam: XC_LoadPackage.LoadPackageParam){
+        Log.e(Hooker::class.java.name, "lpparam.packageName:${lpparam.packageName}")
+        Log.e(Hooker::class.java.name, "lpparam.processName:${lpparam.processName}")
+        when (lpparam.processName) {
+            "com.ss.android.ugc.aweme" ->{
+                Log.e(Hooker::class.java.name, "开始启动抖音插件")
+                val processName = getProcessName(MagicHooker.getSystemContext())
+                Log.e(Hooker::class.java.name, "mainProcessName:$processName")
+                if (TextUtils.equals("com.ss.android.ugc.aweme", processName)) {
+                    //主进程hook
+                    MagicHooker.startup(
+                        lpparam = lpparam,
+                        plugins = listOf(ByteDancePlugins),
+                        centers = ByteDanceEngine.hookerCenters + SharedEngine.hookerCenters
+                    )
+                }
+
             }
         }
     }

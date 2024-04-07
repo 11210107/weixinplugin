@@ -307,57 +307,21 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
 
     private fun init() {
         Log.e(TAG, "init AlarmManager")
-        ContextUtil.weChatApplication.registerReceiver(receiver, intentFilter)
-        val alarmManager =
-            ContextUtil.weChatApplication.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(ACTION_RUN_FETCH_TASK)
-        val pendingIntent =
-            PendingIntent.getBroadcast(ContextUtil.weChatApplication, 111, intent, 0)
-        alarmManager.cancel(pendingIntent)
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + Define.HEART_BEAT_CICLE,
-            Define.FETCH_CICLE,
-            pendingIntent
-        )
-        ContextUtil.weChatApplication.sendBroadcast(intent)
+        IntervalLoginTask.startInterval()
     }
 
-    const val ACTION_RUN_FETCH_TASK = "ACTION_RUN_FETCH_TASK"
-    private val intentFilter = IntentFilter(ACTION_RUN_FETCH_TASK)
 
-    var heartBeatTimer: Timer? = null
-    var heartBeatTask: TimerTask? = null
 
-    private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            Log.e(TAG, "onReceive")
-            val action = intent.action
-            if (ACTION_RUN_FETCH_TASK.equals(action)) {
-                Log.e(TAG, "start intervalHeartTask")
-                intervalHeartTask()
-            }
+    fun getLoginTask(){
+        val params = mutableMapOf<String, String>()
+        params["brokerCode"] = "100801961"
+        params["platform"] = "soft"
+        ThreadUtil.submitTask{
+            Thread.sleep(2000L)
+            val json = NetWorkUtil.get(Define.getMasterInfo(),params)
+            Log.e(WechatPlugins::class.java.name, "json:$json")
         }
     }
 
-    private fun intervalHeartTask() {
-        cancelTask()
-        heartBeatTimer = Timer()
-        heartBeatTask = timerTask {
-            Log.e(TAG, "timerTask heartBeat")
-            val params = mutableMapOf<String, String>()
-            params["brokerCode"] = "100801961"
-            params["platform"] = "soft"
-            ThreadUtil.submitTask{
-                Thread.sleep(2000L)
-                val json = NetWorkUtil.get(Define.getMasterInfo(),params)
-                Log.e(WechatPlugins::class.java.name, "json:$json")
-            }
-        }
-        heartBeatTimer?.schedule(heartBeatTask, 2000L, Define.HEART_BEAT_CICLE)
-    }
-    private fun cancelTask() {
-        heartBeatTimer?.cancel()
-        heartBeatTask?.cancel()
-    }
+
 }

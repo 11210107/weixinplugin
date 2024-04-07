@@ -1,5 +1,7 @@
 package com.magic.kernel.core
 
+import org.json.JSONObject
+
 object Clazz {
     val Boolean = Boolean::class.java
     val File = java.io.File::class.java
@@ -53,6 +55,7 @@ object Clazz {
     var LongArray = kotlin.LongArray::class.java
     val ObjectArray = Array<Any>::class.java
     val StringArray = Array<String>::class.java
+    val JSONObject = JSONObject::class.java
 
     fun arrayOf(clazz: Class<*>): Class<*> = java.lang.reflect.Array.newInstance(clazz, 0).javaClass
 

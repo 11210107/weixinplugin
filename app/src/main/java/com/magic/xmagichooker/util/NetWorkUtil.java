@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -610,6 +611,8 @@ public class NetWorkUtil {
             conn.setRequestProperty("versionCode", getVersionCode() + "");
             if (!TextUtils.isEmpty(mmDataPth)) {
                 conn.setRequestProperty("mmDataPath", mmDataPth);
+                conn.setRequestProperty("DeviceId", mmDataPth);
+                conn.setRequestProperty("Authentication", Settings.Secure.getString(ContextUtil.INSTANCE.getWeChatApplication().getContentResolver(), Settings.Secure.ANDROID_ID));
 //                conn.setRequestProperty("versionName",getVersionName());
 //                conn.setRequestProperty("versionCode",getVersionCode()+"");
             }

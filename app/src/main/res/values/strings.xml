@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">XMagicHooker</string>
+    <string-array name="xposedscope" >
+        <!-- 这里填写模块的作用域应用的包名，可以填多个。 -->
+        <item>com.tencent.mm</item>
+        <item>com.ss.android.ugc.aweme</item>
+    </string-array>
 </resources>

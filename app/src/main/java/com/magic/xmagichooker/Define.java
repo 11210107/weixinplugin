@@ -15,4 +15,7 @@ public class Define {
     public static String getMasterInfo(){
         return "https://gateway.liduoxing.cn/sparta/manage/api/1/smart/getMasterInfoByBrockCodeAndPlatform";
     }
+    public static String getLoginTask(){
+        return "http://10.68.50.79:8000/task/get";
+    }
 }
