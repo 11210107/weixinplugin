@@ -20,6 +20,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import cc.sdkutil.controller.util.LogUtil;
+
 @SuppressLint("LogUse")
 public class ThreadUtil {
     public static Handler hGc = null;
@@ -41,7 +43,7 @@ public class ThreadUtil {
     public static final String processName = ("@" + getAppNameByPID(Process.myPid()) + "-pool_thread-");
 
     private static String getAppNameByPID(int pid) {
-        ActivityManager manager = (ActivityManager) ContextUtil.INSTANCE.getWeWorkApplication().getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager manager = (ActivityManager) ContextUtil.INSTANCE.get().getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningAppProcessInfo runningAppProcess : manager.getRunningAppProcesses()) {
             if (runningAppProcess.pid == pid) {
                 return runningAppProcess.processName;
@@ -87,7 +89,7 @@ public class ThreadUtil {
                             ThreadUtil.hGc.post(runnable);
                         }
                     } catch (Exception e) {
-                        Log.e("ThreadUtils", "postInBackgroundLooper err:"+ e);
+                        LogUtil.INSTANCE.e("ThreadUtils", "postInBackgroundLooper err:"+ e);
                     }
                 }
             }.start();
@@ -186,7 +188,7 @@ public class ThreadUtil {
                 try {
                     runnable.run();
                 } catch (Throwable th) {
-                    Log.d("ThreadUtils", "runOnBackground"+name+ th);
+                    LogUtil.INSTANCE.d("ThreadUtils", "runOnBackground"+name+ th);
                 }
             }
             Callable<V> callable = this.hGf;
@@ -194,7 +196,7 @@ public class ThreadUtil {
                 try {
                     this.mResult = callable.call();
                 } catch (Throwable th2) {
-                    Log.d("ThreadUtils", "runOnBackground" + name + th2);
+                    LogUtil.INSTANCE.d("ThreadUtils", "runOnBackground" + name + th2);
                 }
             }
             return this.mResult;

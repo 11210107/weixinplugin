@@ -1,6 +1,7 @@
 package com.magic.kernel.core
 
 import android.util.Log
+import cc.sdkutil.controller.util.LogUtil
 import com.magic.kernel.utils.XposedUtil
 import de.robv.android.xposed.XC_MethodHook
 import java.util.concurrent.ConcurrentHashMap
@@ -268,7 +269,7 @@ abstract class HookerCenter : IHookerProvider {
         vararg parameterTypes: Class<*>
     ): Hooker {
         return Hooker {
-            Log.e(
+            LogUtil.e(
                 HookerCenter::class.java.name,
                 "iMethodHooker: ${clazz}  method: ${method}  iMethodBefore: ${iMethodBefore}   iMethodAfter: ${iMethodAfter}"
             )
@@ -281,7 +282,7 @@ abstract class HookerCenter : IHookerProvider {
                     }
 
                     override fun afterHookedMethod(param: MethodHookParam?) {
-                        Log.e(HookerCenter::class.java.name, "afterHookedMethod: ${param}")
+                        LogUtil.e(HookerCenter::class.java.name, "afterHookedMethod: ${param}")
                         if (iClazz == null || iMethodAfter == null) return
                         iInvoke(iClazz, iMethodAfter, needObject, needResult, param, notifyType)
                     }
@@ -304,7 +305,7 @@ abstract class HookerCenter : IHookerProvider {
                 object : XC_MethodHook() {
                     override fun beforeHookedMethod(param: MethodHookParam?) {
                         if (iClazz == null || iMethodBefore == null) return
-                        Log.e(
+                        LogUtil.e(
                             HookerCenter::class.java.name,
                             "beforeHook    ${clazz.name}  :  $iMethodBefore"
                         )
@@ -313,7 +314,7 @@ abstract class HookerCenter : IHookerProvider {
 
                     override fun afterHookedMethod(param: MethodHookParam?) {
                         if (iClazz == null || iMethodAfter == null) return
-                        Log.e(
+                        LogUtil.e(
                             HookerCenter::class.java.name,
                             "afterHook   ${clazz.name}  :  $iMethodAfter"
                         )

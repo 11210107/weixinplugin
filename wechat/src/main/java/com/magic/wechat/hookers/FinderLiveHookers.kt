@@ -1,6 +1,7 @@
 package com.magic.wechat.hookers
 
 import android.util.Log
+import cc.sdkutil.controller.util.LogUtil
 import com.magic.kernel.core.Clazz
 import com.magic.kernel.core.Hooker
 import com.magic.kernel.core.HookerCenter
@@ -13,7 +14,7 @@ object FinderLiveHookers:HookerCenter() {
 
 
     override fun provideEventHooker(event: String): Hooker? {
-        Log.e("WechatHooker", "FinderLiveHooker provideEventHooker $event")
+        LogUtil.e("WechatHooker", "FinderLiveHooker provideEventHooker $event")
         return when (event) {
 //            "onEnterFinderLiveVisitorUI" -> iMethodNotifyHooker(
 //                clazz = "com.tencent.mm.plugin.finder.live.PluginFinderLive".findClass(),

@@ -3,6 +3,7 @@ package com.magic.xmagichooker
 import android.app.Activity
 import android.os.Bundle
 import android.util.Log
+import cc.sdkutil.controller.util.LogUtil
 import com.magic.shared.hookers.interfaces.IActivityHooker
 //import com.magic.wework.apis.com.google.protobuf.nano.MessageNano
 //import com.magic.wework.apis.com.tencent.wework.contact.plugin.ContactApiImpl
@@ -21,60 +22,60 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
 
     /*  ------------------  IActivityHooker  ----------------- */
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Log.e(Plugins::class.java.name, "onActivityCreated   class: ${activity.javaClass}")
+        LogUtil.e(Plugins::class.java.name, "onActivityCreated   class: ${activity.javaClass}")
     }
 
     /*  ------------------  IConversationHooker  ----------------- */
     override fun onReconvergeConversation() {
-        Log.e(Plugins::class.java.name, "onReconvergeConversation")
+        LogUtil.e(Plugins::class.java.name, "onReconvergeConversation")
     }
 
     override fun onReloadConvsProperty() {
-        Log.e(Plugins::class.java.name, "onReloadConvsProperty")
+        LogUtil.e(Plugins::class.java.name, "onReloadConvsProperty")
     }
 
     override fun onSyncStateChanged(i: Int, i2: Int) {
-        Log.e(Plugins::class.java.name, "onSyncStateChanged  i: $i   i2: $i2")
+        LogUtil.e(Plugins::class.java.name, "onSyncStateChanged  i: $i   i2: $i2")
     }
 
     override fun onAddConversations(conversationArr: Array<Any>) {
         for (conv in conversationArr) {
-            Log.e(Plugins.javaClass.name, "onAddConversations  ${Conversation.getInfo(conv)}")
+            LogUtil.e(Plugins.javaClass.name, "onAddConversations  ${Conversation.getInfo(conv)}")
         }
 //        ConversationApiImpl.newInstance().updateConversationCache(conversationArr)
 //        for (conversation in conversationArr) {
 //            val conv = Conversation(conversation)
-//            Log.e(Plugins::class.java.name, "onAddConversations   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
+//            LogUtil.e(Plugins::class.java.name, "onAddConversations   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
 //        }
     }
 
     override fun onExitConversation(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onExitConversation  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onExitConversation  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onExitConversation   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onExitConversation   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
     }
 
     override fun onSetReadReceipt(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onSetReadReceipt  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onSetReadReceipt  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onSetReadReceipt   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onSetReadReceipt   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
     }
 
     override fun onAddMembers(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onAddMembers  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onAddMembers  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
 //        for (member in conv.getMembers()) {
-//            Log.e(Plugins::class.java.name, "onAddMembers  remoteId: ${member.operatorRemoteId}  name: ${member.name}   nickname: ${member.nickName}")
+//            LogUtil.e(Plugins::class.java.name, "onAddMembers  remoteId: ${member.operatorRemoteId}  name: ${member.name}   nickname: ${member.nickName}")
 //        }
     }
 
     override fun onAddMessages(conversation: Any, messageArr: Array<Any>, z: Boolean) {
         for (msg in messageArr) {
-            Log.e(Plugins.javaClass.name, "onAddMessages  ${Conversation.getInfo(conversation)}     ${Message.getInfo(msg)}")
+            LogUtil.e(Plugins.javaClass.name, "onAddMessages  ${Conversation.getInfo(conversation)}     ${Message.getInfo(msg)}")
         }
 //        val conv = Conversation(conversation)
 //        for (message0 in messageArr) {
-//            Log.e(Plugins::class.java.name, "onAddMessages   for   消息类型: ${Message(message0).getInfo().contentType}")
+//            LogUtil.e(Plugins::class.java.name, "onAddMessages   for   消息类型: ${Message(message0).getInfo().contentType}")
 //            val messageItem = MessageItem(conversation, message0)
 //            val contentType = WwMessage.Message.parseFrom(Message.getInfo(message0)).contentType
 //            for (msg in messageItem.messages) {
@@ -82,20 +83,20 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
 //                    WwRichmessage.EmotionMessage::class.java -> {
 //                        val msg = msg as WwRichmessage.EmotionMessage
 //                        val downloadInfo = msg.getDownloadInfo(contentType)
-//                        Log.e(Plugins.javaClass.name, "emotion消息类型: $contentType   地址：$downloadInfo")
+//                        LogUtil.e(Plugins.javaClass.name, "emotion消息类型: $contentType   地址：$downloadInfo")
 //                        if (downloadInfo != null) {
 //                            FileDownloadApiImpl.newInstance().downloadFile(downloadInfo) { i, str ->
-//                                Log.e(Plugins.javaClass.name, "下载文件：${if (i == 0) "成功" else "失败"}")
+//                                LogUtil.e(Plugins.javaClass.name, "下载文件：${if (i == 0) "成功" else "失败"}")
 //                            }
 //                        }
 //                    }
 //                    WwRichmessage.FileMessage::class.java -> {
 //                        val msg = msg as WwRichmessage.FileMessage
 //                        val downloadInfo = msg.getDownloadInfo(contentType)
-//                        Log.e(Plugins.javaClass.name, "文件消息类型: ${String(msg.extra)} $contentType   地址：$downloadInfo")
+//                        LogUtil.e(Plugins.javaClass.name, "文件消息类型: ${String(msg.extra)} $contentType   地址：$downloadInfo")
 //                        if (downloadInfo != null) {
 //                            FileDownloadApiImpl.newInstance().downloadFile(downloadInfo) { i, str ->
-//                                Log.e(Plugins.javaClass.name, "下载文件：${if (i == 0) "成功" else "失败"}")
+//                                LogUtil.e(Plugins.javaClass.name, "下载文件：${if (i == 0) "成功" else "失败"}")
 //                            }
 //                        }
 //                    }
@@ -105,7 +106,7 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
 //                                WwMessage.kText, WwMessage.kFile -> {
 //                                    val textMessage = WwRichmessage.TextMessage.parseFrom(message.data)
 //                                    val timeInterval = System.currentTimeMillis() - (Message(message0).getInfo().sendTime.toLong() * 1000)
-//                                    Log.e(Plugins::class.java.name, "onAddMessages 文本消息  ${textMessage.codeLanguage}  消息内容: ${String(textMessage.content)}   时间: $timeInterval")
+//                                    LogUtil.e(Plugins::class.java.name, "onAddMessages 文本消息  ${textMessage.codeLanguage}  消息内容: ${String(textMessage.content)}   时间: $timeInterval")
 //                                    val text = String(textMessage.content)
 //                                    val textSplits = text.split(":")
 //                                    if (timeInterval > 10000) return
@@ -122,7 +123,7 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
 //                                            }
 //                                        }
 //                                        val user = ConversationApiImpl.newInstance().getUserWithoutUpdate(userId)
-//                                        Log.e(Plugins.javaClass.name, "调试结果before  $userId  $sceneType  $user")
+//                                        LogUtil.e(Plugins.javaClass.name, "调试结果before  $userId  $sceneType  $user")
 //                                        UserManagerApiImpl.newInstance().getUserByIdWithScene(longArrayOf(userId), sceneType = sceneType) { i, userArr ->
 //                                            if (userArr.isNotEmpty()) {
 //                                                val userInfos = userArr.map {
@@ -164,12 +165,12 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
 //                                            } else {
 //                                                urlString = splits.last().toString()
 //                                            }
-//                                            Log.e(Plugins.javaClass.name, "发送xxx消息 id: $id  url: $urlString")
+//                                            LogUtil.e(Plugins.javaClass.name, "发送xxx消息 id: $id  url: $urlString")
 //                                            if (urlString.equals("", false)) {
 //                                                MsgApiImpl.newInstance().sendTextualMessage(conv.getInfo().id, "log-发送文件消息指令错误，请输入:\n 发送xxx消息:[userId/conversationId],url地址")
 //                                            } else {
 //                                                MsgApiImpl.newInstance().sendRemoteFileMessage(id, urlString, type) { success, str ->
-//                                                    Log.e(Plugins.javaClass.name, "发送 $type ${if (success) "成功" else "失败: $str"}")
+//                                                    LogUtil.e(Plugins.javaClass.name, "发送 $type ${if (success) "成功" else "失败: $str"}")
 //                                                }
 //                                            }
 //                                        } else {
@@ -394,11 +395,11 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
 //                                            convId = textSplits.last().trim().toLong()
 //                                        }
 //                                        ConversationApiImpl.newInstance().clearAllUnread(convId)
-//                                        Log.e(Plugins.javaClass.name, "log-清除未读消息 成功")
+//                                        LogUtil.e(Plugins.javaClass.name, "log-清除未读消息 成功")
 //                                    } else if (text.startsWith("退出群聊")) {
 //                                        val conversationId = if (textSplits.size > 1) textSplits[1].trim().toLong() else conv.getInfo().id
 //                                        ConversationApiImpl.newInstance().exitConversation(conversationId) { i, conversation ->
-//                                            Log.e(Plugins.javaClass.name, "log-退出群聊 ${if (i == 0) "成功" else "失败"}")
+//                                            LogUtil.e(Plugins.javaClass.name, "log-退出群聊 ${if (i == 0) "成功" else "失败"}")
 //                                        }
 //                                    } else if (text.startsWith("修改群名称")) {
 //                                        val name = if (textSplits.size > 1) textSplits[1].trim() else "测试修改群名称"
@@ -448,7 +449,7 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
 //                                    } else if (text.startsWith("获取缓存的联系人")) {
 //                                        val userInfos = ContactApiImpl.newInstance().getCachedContactList().map {
 //                                            val user = User(it)
-//                                            Log.e(Plugins.javaClass.name, "获取缓存的联系人 $user")
+//                                            LogUtil.e(Plugins.javaClass.name, "获取缓存的联系人 $user")
 //                                            var userSceneType = UserManagerApiImpl.newInstance().getUserSceneType(it)
 //                                            return@map "rid: ${user.getRemoteId()}  name: ${user.getInfo().name}  sceneType: ${userSceneType.mSceneType} convId: ${userSceneType.mId} \n"
 //                                        }
@@ -751,67 +752,67 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
 //                                }
 //                                WwMessage.kAppContent -> {
 //                                    val atMessage = WwRichmessage.AtMessage.parseFrom(message.data)
-//                                    Log.e(Plugins::class.java.name, "onAddMessages @消息  ${String(atMessage.name)}  uin: ${atMessage.uin}")
+//                                    LogUtil.e(Plugins::class.java.name, "onAddMessages @消息  ${String(atMessage.name)}  uin: ${atMessage.uin}")
 //                                }
 //                                else ->
-//                                    Log.e(Plugins::class.java.name, "onAddMessages 未解析的消息  ${message.contentType}  消息内容: ${String(message.data)}")
+//                                    LogUtil.e(Plugins::class.java.name, "onAddMessages 未解析的消息  ${message.contentType}  消息内容: ${String(message.data)}")
 //                            }
 //                        }
 //                    }
 //                    WwRichmessage.LinkMessage::class.java -> {
 //                        val msg = msg as WwRichmessage.LinkMessage
 //                        val downloadInfo = msg.getDownloadInfo()
-//                        Log.e(Plugins.javaClass.name, "链接消息类型: $contentType   $downloadInfo")
+//                        LogUtil.e(Plugins.javaClass.name, "链接消息类型: $contentType   $downloadInfo")
 //                        Handler(Looper.getMainLooper()).postDelayed({
 //                            if (msg.original != null) {
 //                                val path = WeworkServiceImpl.getMessageFileDownloadPath(MessageNano.toByteArray(msg.original!!), contentType)
-//                                Log.e(Plugins.javaClass.name, "链接消息类型:  $contentType   地址：$path")
+//                                LogUtil.e(Plugins.javaClass.name, "链接消息类型:  $contentType   地址：$path")
 //                            }
 //                        }, 1)
 //                        if (downloadInfo != null) {
 //                            FileDownloadApiImpl.newInstance().downloadFile(downloadInfo) { i, str ->
-//                                Log.e(Plugins.javaClass.name, "下载文件：${if (i == 0) "成功" else "失败"}")
+//                                LogUtil.e(Plugins.javaClass.name, "下载文件：${if (i == 0) "成功" else "失败"}")
 //                            }
 //                        }
 //                    }
 //                    WwRichmessage.LocationMessage::class.java -> {
 //                        val msg = msg as WwRichmessage.LocationMessage
-//                        Log.e(Plugins.javaClass.name, "定位消息: address: ${String(msg.address)}  latitude: ${msg.latitude}  longitude: ${msg.longitude}   staticMapUrl: ${String(msg.staticMapUrl)}   title: ${String(msg.title)}  zoom: ${msg.zoom}")
+//                        LogUtil.e(Plugins.javaClass.name, "定位消息: address: ${String(msg.address)}  latitude: ${msg.latitude}  longitude: ${msg.longitude}   staticMapUrl: ${String(msg.staticMapUrl)}   title: ${String(msg.title)}  zoom: ${msg.zoom}")
 //                    }
 //                    WwRichmessage.VideoMessage::class.java -> {
 //                        val msg = msg as WwRichmessage.VideoMessage
 //                        val downloadInfo = msg.getDownloadInfo(contentType)
-//                        Log.e(Plugins.javaClass.name, "视频消息类型: $contentType   $downloadInfo")
+//                        LogUtil.e(Plugins.javaClass.name, "视频消息类型: $contentType   $downloadInfo")
 //                        Handler(Looper.getMainLooper()).postDelayed({
 //                            if (msg.original != null) {
 //                                val path = WeworkServiceImpl.getMessageFileDownloadPath(MessageNano.toByteArray(msg.original!!), contentType)
-//                                Log.e(Plugins.javaClass.name, "视频消息类型:  $contentType   地址：$path")
+//                                LogUtil.e(Plugins.javaClass.name, "视频消息类型:  $contentType   地址：$path")
 //                            }
 //                        }, 1)
 //                        if (downloadInfo != null) {
 //                            FileDownloadApiImpl.newInstance().downloadFile(downloadInfo) { i, str ->
-//                                Log.e(Plugins.javaClass.name, "下载文件：${if (i == 0) "成功" else "失败"}")
+//                                LogUtil.e(Plugins.javaClass.name, "下载文件：${if (i == 0) "成功" else "失败"}")
 //                            }
 //                        }
 //                    }
 //                    WwRichmessage.WeAppMessage::class.java -> {
 //                        val msg = msg as WwRichmessage.WeAppMessage
 //                        val downloadInfo = msg.getDownloadInfo()
-//                        Log.e(Plugins.javaClass.name, "小程序消息类型: $contentType   $downloadInfo")
+//                        LogUtil.e(Plugins.javaClass.name, "小程序消息类型: $contentType   $downloadInfo")
 //                        Handler(Looper.getMainLooper()).postDelayed({
 //                            if (msg.original != null) {
 //                                val path = WeworkServiceImpl.getMessageFileDownloadPath(MessageNano.toByteArray(msg.original!!), contentType)
-//                                Log.e(Plugins.javaClass.name, "小程序消息类型:  $contentType   地址：$path")
+//                                LogUtil.e(Plugins.javaClass.name, "小程序消息类型:  $contentType   地址：$path")
 //                            }
 //                        }, 1)
 //                        if (downloadInfo != null) {
 //                            FileDownloadApiImpl.newInstance().downloadFile(downloadInfo) { i, str ->
-//                                Log.e(Plugins.javaClass.name, "下载文件：${if (i == 0) "成功" else "失败"}")
+//                                LogUtil.e(Plugins.javaClass.name, "下载文件：${if (i == 0) "成功" else "失败"}")
 //                            }
 //                        }
 //                    }
 //                    else ->
-//                        Log.e(Plugins::class.java.name, "onAddMessages  else  ${msg.javaClass}  消息结构: ${Gson().toJson(msg)}")
+//                        LogUtil.e(Plugins::class.java.name, "onAddMessages  else  ${msg.javaClass}  消息结构: ${Gson().toJson(msg)}")
 //                }
 //            }
 //        }
@@ -819,133 +820,133 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
     }
 
     override fun onChangeOwner(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onChangeOwner  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onChangeOwner  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onChangeOwner   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onChangeOwner   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
     }
 
     override fun onDraftDidChange(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onDraftDidChange  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onDraftDidChange  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onDraftDidChange   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onDraftDidChange   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
     }
 
     override fun onMessageStateChange(conversation: Any, message: Any, i: Int) {
-        Log.e(Plugins.javaClass.name, "onMessageStateChange  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onMessageStateChange  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onMessageStateChange: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onMessageStateChange: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
 //        val msg = Message(message)
-//        Log.e(Plugins::class.java.name, "onMessageStateChange： ${msg.getInfo().contentType}  -   ${String(msg.getInfo().content)}   状态： ${i}")
+//        LogUtil.e(Plugins::class.java.name, "onMessageStateChange： ${msg.getInfo().contentType}  -   ${String(msg.getInfo().content)}   状态： ${i}")
     }
 
     override fun onMessageUpdate(conversation: Any, message: Any) {
-        Log.e(Plugins.javaClass.name, "onMessageUpdate  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onMessageUpdate  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onMessageUpdate   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onMessageUpdate   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
 //        val msg = Message(message)
-//        Log.e(Plugins::class.java.name, "onMessageUpdate  类型： ${msg.getInfo().contentType}  -  内容：  ${String(msg.getInfo().content)}")
+//        LogUtil.e(Plugins::class.java.name, "onMessageUpdate  类型： ${msg.getInfo().contentType}  -  内容：  ${String(msg.getInfo().content)}")
     }
 
     override fun onModifyName(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onModifyName  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onModifyName  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onMessageUpdate   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onMessageUpdate   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
     }
 
     override fun onPropertyChanged(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onPropertyChanged  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onPropertyChanged  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onPropertyChanged   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onPropertyChanged   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
     }
 
     override fun onRemoveAllMessages(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onRemoveAllMessages  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onRemoveAllMessages  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onRemoveAllMessages   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onRemoveAllMessages   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
     }
 
     override fun onRemoveMembers(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onRemoveMembers  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onRemoveMembers  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onRemoveMembers   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onRemoveMembers   remoteId: ${conv.getInfo().remoteId}  -  name: ${conv.getInfo().name}  -  type: ${conv.getInfo().type}")
 //        for (member in conv.getMembers()) {
-//            Log.e(Plugins::class.java.name, "onRemoveMembers  remoteId: ${member.operatorRemoteId}  name: ${member.name}   nickname: ${member.nickName}")
+//            LogUtil.e(Plugins::class.java.name, "onRemoveMembers  remoteId: ${member.operatorRemoteId}  name: ${member.name}   nickname: ${member.nickName}")
 //        }
     }
 
     override fun onRemoveMessages(conversation: Any, message: Any) {
-        Log.e(Plugins.javaClass.name, "onRemoveMessages  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onRemoveMessages  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onRemoveMessages: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onRemoveMessages: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
 //        val msg = Message(message)
-//        Log.e(Plugins::class.java.name, "onRemoveMessages： ${msg.getInfo().contentType}  -   ${String(msg.getInfo().content)}")
+//        LogUtil.e(Plugins::class.java.name, "onRemoveMessages： ${msg.getInfo().contentType}  -   ${String(msg.getInfo().content)}")
     }
 
     override fun onSetAllBan(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onSetAllBan  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onSetAllBan  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onSetAllBan: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onSetAllBan: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
     }
 
     override fun onSetCollect(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onSetCollect  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onSetCollect  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onSetCollect: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onSetCollect: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
     }
 
     override fun onSetConfirmAddMember(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onSetConfirmAddMember  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onSetConfirmAddMember  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onSetConfirmAddMember: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onSetConfirmAddMember: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
     }
 
     override fun onSetMembersBan(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onSetMembersBan  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onSetMembersBan  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onSetMembersBan: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onSetMembersBan: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
     }
 
     override fun onSetOwnerManager(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onSetOwnerManager  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onSetOwnerManager  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onSetOwnerManager: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onSetOwnerManager: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
     }
 
     override fun onSetShield(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onSetShield  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onSetShield  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onSetShield: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onSetShield: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
     }
 
     override fun onSetTop(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onSetTop  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onSetTop  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onSetTop: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onSetTop: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
     }
 
     override fun onTypingStateUpdate(conversation: Any) {
-        Log.e(Plugins.javaClass.name, "onTypingStateUpdate  ${Conversation.getInfo(conversation)}")
+        LogUtil.e(Plugins.javaClass.name, "onTypingStateUpdate  ${Conversation.getInfo(conversation)}")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onTypingStateUpdate: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onTypingStateUpdate: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
     }
 
     override fun onUnReadCountChanged(conversation: Any, i: Int, i2: Int) {
-        Log.e(Plugins.javaClass.name, "onUnReadCountChanged  ${Conversation.getInfo(conversation)}   $i   $i2")
+        LogUtil.e(Plugins.javaClass.name, "onUnReadCountChanged  ${Conversation.getInfo(conversation)}   $i   $i2")
 //        val conv = Conversation(conversation)
-//        Log.e(Plugins::class.java.name, "onUnReadCountChanged: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
+//        LogUtil.e(Plugins::class.java.name, "onUnReadCountChanged: ${conv.getInfo().remoteId}  -  ${conv.getInfo().name}  -  ${conv.getInfo().type}")
     }
 
 
     /*  ------------------  INotificationHooker  ----------------- */
 
     override fun onObserve(i: Int, notificationInfo: Any) {
-        Log.e(Plugins.javaClass.name, "收到通知回调 onObserve:  ${NotificationInfo.parse(notificationInfo)}")
+        LogUtil.e(Plugins.javaClass.name, "收到通知回调 onObserve:  ${NotificationInfo.parse(notificationInfo)}")
 //        val info = NotificationInfo.parse(notificationInfo)
-//        Log.e(Plugins::class.java.name, "onObserve: i: $i   notificationInfo: ${info.mDetail2int}  ${info.mDetail3}  ${info.mDetail4} detail: ${info.mDetail}  detail2: ${info.mDetail2}  raw: ${String(info.mRawData)}")
+//        LogUtil.e(Plugins::class.java.name, "onObserve: i: $i   notificationInfo: ${info.mDetail2int}  ${info.mDetail3}  ${info.mDetail4} detail: ${info.mDetail}  detail2: ${info.mDetail2}  raw: ${String(info.mRawData)}")
 //        if (i == 2 && info.mDetail != null) { // 消息
 //            val message = Message(info.mDetail!!)
 //            if (message.contentType == WwMessage.kFriendApply) { // 好友申请
-//                Log.e(Plugins.javaClass.name, "onObserve  好友申请   ${info.mDetail}    ${Thread.currentThread()}")
+//                LogUtil.e(Plugins.javaClass.name, "onObserve  好友申请   ${info.mDetail}    ${Thread.currentThread()}")
 //                Handler(Looper.getMainLooper()).postDelayed({
 //                    ContactApiImpl.newInstance().getMatchedContactList(ContactService.CONTACT_TYPE_RCT_APPLY) { i, users ->
 //                        if (i == 0 && users.isNotEmpty()) {
@@ -953,14 +954,14 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
 //                                .filter { !ContactApiImpl.newInstance().isContactAdded(User(it).getRemoteId()) }
 //                            for (user in filterUsers) {
 //                                ContactManagerApiImpl.newInstance().operateContact(ContactService.OPERATE_TYPE_AGREE, user = user) { i, str ->
-//                                    Log.e(Plugins.javaClass.name, "自动通过好友添加 $i")
+//                                    LogUtil.e(Plugins.javaClass.name, "自动通过好友添加 $i")
 //                                }
 //                            }
 //                        }
 //                    }
 //                }, 1000)
 //            } else if (message.contentType == WwMessage.kFriendChanged || message.contentType == WwMessage.kWxFriendChanged) { // 好友变化
-//                Log.e(Plugins::class.java.name, "onObserve: 好友变化: $i   notificationInfo: ${info.mDetail}")
+//                LogUtil.e(Plugins::class.java.name, "onObserve: 好友变化: $i   notificationInfo: ${info.mDetail}")
 //            }
 //        }
     }
@@ -968,14 +969,14 @@ object Plugins: IActivityHooker, IApplicationHooker, IConversationHooker, INotif
     /*  ------------------  IContactHooker  ----------------- */
 //
 //    override fun onApplyUnReadCountChanged(i: Int) {
-//        Log.e(Plugins::class.java.name, "onApplyUnReadCountChanged: i: $i")
+//        LogUtil.e(Plugins::class.java.name, "onApplyUnReadCountChanged: i: $i")
 //    }
 //
 //    override fun onContactListUnradCountChanged(i: Int, i2: Int, i3: Int) {
-//        Log.e(Plugins::class.java.name, "onContactListUnradCountChanged: i: $i  i2: $i2  i3: $i3")
+//        LogUtil.e(Plugins::class.java.name, "onContactListUnradCountChanged: i: $i  i2: $i2  i3: $i3")
 //    }
 //
 //    override fun onSyncContactFinish(i: Int, z: Boolean) {
-//        Log.e(Plugins::class.java.name, "onSyncContactFinish: i: $i  z: $z")
+//        LogUtil.e(Plugins::class.java.name, "onSyncContactFinish: i: $i  z: $z")
 //    }
 }

@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
+import cc.sdkutil.controller.util.LogUtil
 import com.magic.xmagichooker.util.ContextUtil
 import java.util.Timer
 import java.util.TimerTask
@@ -18,8 +19,9 @@ object IntervalLoginTask {
     var heartBeatTask: TimerTask? = null
     const val ACTION_RUN_FETCH_TASK = "ACTION_RUN_FETCH_TASK"
     private val intentFilter = IntentFilter(ACTION_RUN_FETCH_TASK)
-
-    fun startInterval(){
+    var isWechat = false
+    fun startInterval(isWechat: Boolean){
+        this.isWechat = isWechat
         ContextUtil.weChatApplication.registerReceiver(receiver, intentFilter)
         val alarmManager =
             ContextUtil.weChatApplication.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -29,8 +31,8 @@ object IntervalLoginTask {
         alarmManager.cancel(pendingIntent)
         alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + Define.HEART_BEAT_CICLE,
-            Define.FETCH_CICLE,
+            System.currentTimeMillis() + Define.HEART_BEAT_CYCLE,
+            Define.FETCH_CYCLE,
             pendingIntent
         )
         ContextUtil.weChatApplication.sendBroadcast(intent)
@@ -38,10 +40,10 @@ object IntervalLoginTask {
 
     private var receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Log.e(TAG, "onReceive")
+            LogUtil.e(TAG, "onReceive")
             val action = intent.action
             if (ACTION_RUN_FETCH_TASK.equals(action)) {
-                Log.e(TAG, "start intervalHeartTask")
+                LogUtil.e(TAG, "start intervalHeartTask")
                 intervalHeartTask()
             }
         }
@@ -50,10 +52,14 @@ object IntervalLoginTask {
         cancelTask()
         heartBeatTimer = Timer()
         heartBeatTask = timerTask {
-            Log.e(TAG, "timerTask heartBeat")
-            ByteDancePlugins.getLoginTask()
+            LogUtil.e(TAG, "timerTask heartBeat")
+            if (isWechat) {
+                WechatPlugins.getLoginTask()
+            } else {
+                ByteDancePlugins.getLoginTask()
+            }
         }
-        heartBeatTimer?.schedule(heartBeatTask, 2000L, Define.HEART_BEAT_CICLE)
+        heartBeatTimer?.schedule(heartBeatTask, 2000L, Define.HEART_BEAT_CYCLE)
     }
     private fun cancelTask() {
         heartBeatTimer?.cancel()

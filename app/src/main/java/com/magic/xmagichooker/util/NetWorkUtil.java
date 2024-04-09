@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.magic.xmagichooker.BuildConfig;
@@ -43,6 +44,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import cc.sdkutil.controller.util.LogUtil;
 
 
 public class NetWorkUtil {
@@ -385,6 +388,7 @@ public class NetWorkUtil {
      */
     public static JSONObject get(String path, Object o, String mmDataPath) {
         String params = objectToGetString(o);
+        LogUtil.INSTANCE.d(TAG, params);
         HttpURLConnection conn = getHttpUrlConnection(path + "?" + params, HTTP_PARAMS.GET, mmDataPath);
         if (conn == null) {
             LogUtils.e(TAG, "网络错误 conn is null !!!");
@@ -599,6 +603,7 @@ public class NetWorkUtil {
     private static HttpURLConnection getHttpUrlConnection(String urlStr, HTTP_PARAMS http_params, String mmDataPth) {
         try {
             URL url = new URL(urlStr);
+            LogUtil.INSTANCE.d(TAG,"url: " + url.toString());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(10000);
             conn.setReadTimeout(60000);

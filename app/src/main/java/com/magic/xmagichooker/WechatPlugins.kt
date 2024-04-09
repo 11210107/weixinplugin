@@ -11,8 +11,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.provider.Settings.Global
+import android.text.TextUtils
 import android.util.Log
 import android.view.WindowManager
+import cc.sdkutil.controller.util.LogUtil
+import com.google.gson.Gson
 import com.magic.kernel.MagicGlobal
 import com.magic.kernel.callMethod
 import com.magic.kernel.callStaticMethod
@@ -22,6 +25,8 @@ import com.magic.kernel.utils.ThreadUtil
 import com.magic.shared.hookers.interfaces.IActivityHooker
 import com.magic.wechat.hookers.interfaces.IFinderLiveHooker
 import com.magic.wework.hookers.interfaces.IApplicationHooker
+import com.magic.xmagichooker.model.BaseResult
+import com.magic.xmagichooker.model.ScanQRLoginTask
 import com.magic.xmagichooker.util.ContextUtil
 import com.magic.xmagichooker.util.NetWorkUtil
 import java.util.Timer
@@ -30,30 +35,35 @@ import kotlin.concurrent.timerTask
 
 object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
     val TAG = WechatPlugins::class.java.simpleName
-
+    val mGson by lazy {
+        Gson()
+    }
     var loadLiveInfo = false
     var isInit = false
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Log.e(WechatPlugins::class.java.name, "onActivityCreated   class: ${activity.javaClass}")
+        LogUtil.e(WechatPlugins::class.java.name, "onActivityCreated   class: ${activity.javaClass}")
         if (activity.javaClass.name == WechatClass.FinderLiveVisitorAffinityUI.name) {
             val intent = activity.intent
 
 //            val intent =
 //                activity.callMethod(WechatClass.FinderLiveVisitorAffinityUI.Method.getIntent)
-            Log.e(WechatPlugins::class.java.name, "FinderLiveVisitorAffinityUI   intent: ${intent}")
+            LogUtil.e(WechatPlugins::class.java.name, "FinderLiveVisitorAffinityUI   intent: ${intent}")
 
             val keyContextId = intent.getStringExtra("key_context_id")
-            Log.e(WechatPlugins::class.java.name, "keyContextId:$keyContextId ")
+            LogUtil.e(WechatPlugins::class.java.name, "keyContextId:$keyContextId ")
 
 
             val keyClickTabContextId = intent.getStringExtra("key_click_tab_context_id")
-            Log.e(WechatPlugins::class.java.name, "keyClickTabContextId:$keyClickTabContextId ")
+            LogUtil.e(WechatPlugins::class.java.name, "keyClickTabContextId:$keyClickTabContextId ")
 
             val keyClickSubTabContextId = intent.getStringExtra("key_click_sub_tab_context_id")
-            Log.e(WechatPlugins::class.java.name, "keyClickSubTabContextId:$keyClickSubTabContextId")
+            LogUtil.e(WechatPlugins::class.java.name, "keyClickSubTabContextId:$keyClickSubTabContextId")
 
             val keyChnlExtra = intent.getStringExtra("key_chnl_extra")
-            Log.e(WechatPlugins::class.java.name, "keyChnlExtra:$keyChnlExtra")
+            LogUtil.e(WechatPlugins::class.java.name, "keyChnlExtra:$keyChnlExtra")
+
+        }
+        if (activity.javaClass.name == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {
 
         }
         if (activity.javaClass.name == "com.tencent.mm.plugin.fts.ui.FTSMainUI") {
@@ -66,32 +76,38 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
         //                intent
         //            )
         //            val intent = activity.callMethod("getIntent") as Intent
-        //            Log.e(TAG,"onActivityCreated from_teen_mode_setting_page:${intent.callMethod("getBooleanExtra","from_teen_mode_setting_page",false)}")
-        //            Log.e(TAG,"onActivityCreated KEY_DO_NOT_CHECK_ENTER_BIZ_PROFILE:${intent.callMethod("getBooleanExtra","KEY_DO_NOT_CHECK_ENTER_BIZ_PROFILE",false)}")
+        //            LogUtil.e(TAG,"onActivityCreated from_teen_mode_setting_page:${intent.callMethod("getBooleanExtra","from_teen_mode_setting_page",false)}")
+        //            LogUtil.e(TAG,"onActivityCreated KEY_DO_NOT_CHECK_ENTER_BIZ_PROFILE:${intent.callMethod("getBooleanExtra","KEY_DO_NOT_CHECK_ENTER_BIZ_PROFILE",false)}")
 
 
             }
         }
-        onInit(activity)
-        Log.e(WechatPlugins::class.java.name, "onActivityCreated22 *******")
 
+        LogUtil.e(WechatPlugins::class.java.name, "onActivityCreated22 *******")
+
+    }
+
+    override fun onActivityResumed(activity: Activity) {
+        super.onActivityResumed(activity)
+        onInit(activity)
     }
 
     override fun b(WebView:Any,url: String) {
-        Log.e(WechatPlugins::class.java.name, "WebView b $url")
+        LogUtil.e(WechatPlugins::class.java.name, "WebView b $url")
         val js = "javascript:document.querySelector('.confirm .weui-btn.weui-btn_primary').click()"
         ThreadUtil.runOnMainThread({
-            Log.e(WechatPlugins::class.java.name, "WebView evaluateJavascript")
+            LogUtil.e(WechatPlugins::class.java.name, "WebView evaluateJavascript")
             WebView.callMethod("evaluateJavascript",js,null)
-            Log.e(WechatPlugins::class.java.name, "WebView evaluateJavascript")
+            LogUtil.e(WechatPlugins::class.java.name, "WebView evaluateJavascript")
         },3000L)
 
     }
-    private fun openWebViewUI(token:String) {
+    private fun openWebViewUI(url:String) {
         val intent = Intent()
-        intent.putExtra("rawUrl", "https://channels.weixin.qq.com/mobile/confirm_login.html?token=${token}")
+//        intent.putExtra("rawUrl", "https://channels.weixin.qq.com/mobile/confirm_login.html?token=${token}")
+        intent.putExtra("rawUrl", url)
         val cClass = "com.tencent.mm.bz.c".findClass()
-        Log.e(WechatPlugins::class.java.name, "cClass:$cClass")
+        LogUtil.e(WechatPlugins::class.java.name, "cClass:$cClass")
         val MMApplicationContextClass =
             "com.tencent.mm.sdk.platformtools.MMApplicationContext".findClass()
         val context = MMApplicationContextClass.callStaticMethod("getContext") as Context
@@ -107,52 +123,52 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
     }
 
 //    override fun onCreate(bundle: Bundle) {
-//        Log.e(WechatPlugins::class.java.name, "onCreate bundle:$bundle -------")
+//        LogUtil.e(WechatPlugins::class.java.name, "onCreate bundle:$bundle -------")
 //    }
 //
 //    override fun onResume(uiComponent:Any) {
-//        Log.e(WechatPlugins::class.java.name, "UIComponent onResume:$uiComponent")
+//        LogUtil.e(WechatPlugins::class.java.name, "UIComponent onResume:$uiComponent")
 //        if (uiComponent.javaClass.name == "com.tencent.mm.plugin.finder.live.viewmodel.component.i") {
 //            val intent = uiComponent.callMethod("getIntent")
-//            Log.e(WechatPlugins::class.java.name, "UIComponent intent:$intent")
+//            LogUtil.e(WechatPlugins::class.java.name, "UIComponent intent:$intent")
 //            val finderLiveBundle = intent?.callMethod("getParcelableExtra", "KEY_PARAMS_CONFIG")
-//            Log.e(WechatPlugins::class.java.name, "UIComponent finderLiveBundle:$finderLiveBundle")
+//            LogUtil.e(WechatPlugins::class.java.name, "UIComponent finderLiveBundle:$finderLiveBundle")
 //        }
 //        if (uiComponent.javaClass.name == "com.tencent.mm.plugin.finder.profile.uic.FinderProfileFeedUIC") {
 //            //进入视频号主页
 //            val intent = uiComponent.callMethod("getIntent")
 //            val liveNoticeId = intent?.callMethod("getStringExtra", "KEY_FINDER_PROFILE_UI_REQUEST_LIST_POSITION")
-//            Log.e(TAG, "onFragmentResume liveNoticeId:$liveNoticeId")
+//            LogUtil.e(TAG, "onFragmentResume liveNoticeId:$liveNoticeId")
 //            val finderProfileFeedLoader = uiComponent.callMethod("getFeedLoader")
-//            Log.e(TAG, "onFragmentResume finderProfileFeedLoader:$finderProfileFeedLoader")
+//            LogUtil.e(TAG, "onFragmentResume finderProfileFeedLoader:$finderProfileFeedLoader")
 //
 //            val dataList = finderProfileFeedLoader?.callMethod("getDataList")
-//            Log.e(TAG, "onFragmentResume dataList:$dataList")
+//            LogUtil.e(TAG, "onFragmentResume dataList:$dataList")
 //
 //            val topicFilterList = finderProfileFeedLoader?.callMethod("getTopicFilterList")
 //
 //
-//            Log.e(TAG, "onFragmentResume topicFilterList:$topicFilterList")
+//            LogUtil.e(TAG, "onFragmentResume topicFilterList:$topicFilterList")
 //        }
 //    }
 
 
     /*override fun getFollowContact(followListPresent: Any, aVar: Any, pVar: Any) {
-        Log.e(WechatPlugins::class.java.name, "FollowListPresent:getFollowContact$followListPresent")
+        LogUtil.e(WechatPlugins::class.java.name, "FollowListPresent:getFollowContact$followListPresent")
         ThreadUtil.submitTask {
             val followList = followListPresent.getObjectField("qAW") as ArrayList<Any>
 
-            Log.e(TAG,"followList:$followList")
+            LogUtil.e(TAG,"followList:$followList")
             val followListViewCallback = followListPresent.getObjectField("GFr")
-            Log.e(TAG,"getFollowContact followListViewCallback:$followListViewCallback")
+            LogUtil.e(TAG,"getFollowContact followListViewCallback:$followListViewCallback")
             val mMActivity = followListViewCallback?.getObjectField("activity") as Activity
             followList.forEach {
                 val contact = it.getObjectField("contact")
-                Log.e(TAG,"contact:$contact")
+                LogUtil.e(TAG,"contact:$contact")
                 val liveStatus = contact?.getIntField("field_liveStatus")
-                Log.e(TAG,"liveStatus:$liveStatus")
+                LogUtil.e(TAG,"liveStatus:$liveStatus")
                 val userName = contact?.callMethod("getUsername") as String
-                Log.e(TAG,"getFollowContact userName:$userName")
+                LogUtil.e(TAG,"getFollowContact userName:$userName")
                 if (liveStatus == 1) {
                     mMActivity?.let {
                         ThreadUtil.runOnMainThread({
@@ -171,49 +187,49 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
     }*/
 
 //    override fun jumpToLive(baseFinderFeed: Any, i2: Int) {
-//        Log.e(TAG, "jumpToLive:$baseFinderFeed")
+//        LogUtil.e(TAG, "jumpToLive:$baseFinderFeed")
 //        val finderItem = baseFinderFeed.getObjectField("feedObject")
-//        Log.e(TAG, "finderItem:$finderItem")
+//        LogUtil.e(TAG, "finderItem:$finderItem")
 //        val finderObject = finderItem?.callMethod("getFeedObject")
-//        Log.e(TAG, "finderObject:$finderObject")
+//        LogUtil.e(TAG, "finderObject:$finderObject")
 //        val liveInfo = finderObject?.getObjectField("liveInfo")
-//        Log.e(TAG, "liveInfo:$liveInfo")
+//        LogUtil.e(TAG, "liveInfo:$liveInfo")
 //        val liveId = liveInfo?.getLongField("liveId")
-//        Log.e(TAG, "liveId:$liveId")
+//        LogUtil.e(TAG, "liveId:$liveId")
 //        val streamUrl = liveInfo?.getObjectField("nom")
-//        Log.e(TAG, "streamUrl:$streamUrl")
+//        LogUtil.e(TAG, "streamUrl:$streamUrl")
 //    }
 
 //    override fun onFetchDone(finderProfileFeedLoader:Any,iResponse: Any) {
-//        Log.e(TAG, "onFetchDone:$iResponse")
+//        LogUtil.e(TAG, "onFetchDone:$iResponse")
 //        if (iResponse.javaClass.name == "com.tencent.mm.plugin.finder.feed.model.FinderProfileFeedLoader\$ProfileResponse") {
 //            val isRequestAll = iResponse.callMethod("isRequestAll")
-//            Log.e(TAG, "isRequestAll:$isRequestAll")
+//            LogUtil.e(TAG, "isRequestAll:$isRequestAll")
 //            val topicFilterList = iResponse.callMethod("getFilterList")
 //
-//            Log.e(TAG, "topicFilterList:$topicFilterList")
+//            LogUtil.e(TAG, "topicFilterList:$topicFilterList")
 //
 //            val pullType = iResponse.callMethod("getPullType")
 //            val hasMore = iResponse.callMethod("getHasMore")
-//            Log.e(TAG, "pullType:$pullType")
-//            Log.e(TAG, "hasMore:$hasMore")
+//            LogUtil.e(TAG, "pullType:$pullType")
+//            LogUtil.e(TAG, "hasMore:$hasMore")
 //            if (pullType == 1) {
 //                val dataBuffer = finderProfileFeedLoader.callMethod("getDataList")
-//                Log.e(TAG, "onFetchDone dataList:$dataBuffer")
+//                LogUtil.e(TAG, "onFetchDone dataList:$dataBuffer")
 //                val finderFeed = dataBuffer?.callMethod("get", 0)
-//                Log.e(TAG, "onFetchDone finderFeed:$finderFeed")
+//                LogUtil.e(TAG, "onFetchDone finderFeed:$finderFeed")
 //                val finderItem = finderFeed?.getObjectField("feedObject")
-//                Log.e(TAG, "onFetchDone finderItem:$finderItem")
+//                LogUtil.e(TAG, "onFetchDone finderItem:$finderItem")
 //                val isLiveFeed = finderItem?.callMethod("isLiveFeed") as Boolean
 //                if (isLiveFeed) {
 //                    val finderObject = finderItem?.callMethod("getFinderObject")
-//                    Log.e(TAG, "finderObject:$finderObject")
+//                    LogUtil.e(TAG, "finderObject:$finderObject")
 //                    val liveInfo = finderObject?.getObjectField("liveInfo")
-//                    Log.e(TAG, "liveInfo:$liveInfo")
+//                    LogUtil.e(TAG, "liveInfo:$liveInfo")
 //                    val liveId = liveInfo?.getLongField("liveId")
-//                    Log.e(TAG, "liveId:$liveId")
+//                    LogUtil.e(TAG, "liveId:$liveId")
 //                    val streamUrl = liveInfo?.getObjectField("nom")
-//                    Log.e(TAG, "streamUrl:$streamUrl")/**/
+//                    LogUtil.e(TAG, "streamUrl:$streamUrl")/**/
 //                }
 //                loadLiveInfo = true
 //            }
@@ -221,14 +237,14 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
 //            val everIn = finderProfileFeedLoader.getBooleanField("everIn")
 //            val allowPrefetch = finderProfileFeedLoader.getIntField("allowPrefetch")
 //            val showJustWatch = finderProfileFeedLoader.getIntField("showJustWatch")
-//            Log.e(TAG, "readExist:$readExist,everIn:$everIn,allowPrefetch:$allowPrefetch,showJustWatch:$showJustWatch")
+//            LogUtil.e(TAG, "readExist:$readExist,everIn:$everIn,allowPrefetch:$allowPrefetch,showJustWatch:$showJustWatch")
 //        }
 //    }
 
     /*override fun getFeedLoader(finderProfileFeedUIC:Any) {
-        Log.e(TAG, "FinderProfileFeedUIC onFilterDataChanged ")
+        LogUtil.e(TAG, "FinderProfileFeedUIC onFilterDataChanged ")
         val activity = finderProfileFeedUIC.callMethod("getActivity") as Activity
-        Log.e(TAG, "FinderProfileFeedUIC activity$activity ")
+        LogUtil.e(TAG, "FinderProfileFeedUIC activity$activity ")
         ThreadUtil.runOnMainThread({
             if (loadLiveInfo) {
                 exitFinderProfileUI(activity)
@@ -237,11 +253,11 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
 
     }*/
 
-    private fun exitFinderProfileUI(activity: Activity) {
-        Log.e(TAG, "FinderProfileFeedUIC exitFinderProfileUI")
-        activity.finish()
-        loadLiveInfo = false
-    }
+//    private fun exitFinderProfileUI(activity: Activity) {
+//        LogUtil.e(TAG, "FinderProfileFeedUIC exitFinderProfileUI")
+//        activity.finish()
+//        loadLiveInfo = false
+//    }
 
 
 //    override fun onEnterFinderLiveVisitorUI(
@@ -260,28 +276,28 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
 //        r37: Int,
 //        r38: Boolean
 //    ) {
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r24:$r24")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r25:$r25")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r26:$r26")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r28:$r28")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r29:$r29")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r30:$r30")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r31:$r31")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r32:$r32")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r33:$r33")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r34:$r34")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r35:$r35")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r36:$r36")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r37:$r37")
-//        Log.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r38:$r38")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r24:$r24")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r25:$r25")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r26:$r26")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r28:$r28")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r29:$r29")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r30:$r30")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r31:$r31")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r32:$r32")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r33:$r33")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r34:$r34")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r35:$r35")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r36:$r36")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r37:$r37")
+//        LogUtil.e(WechatPlugins::class.java.name, "onEnterFinderLiveVisitorUI:r38:$r38")
 //    }
 //
 //    override fun onViewCreated(view: View, bundle: Bundle) {
-//        Log.e(WechatPlugins::class.java.name, "onViewCreated bundle:$bundle -------")
+//        LogUtil.e(WechatPlugins::class.java.name, "onViewCreated bundle:$bundle -------")
 //    }
 
 //    override fun onFragmentResume(fragment: Any) {
-//        Log.e(WechatPlugins::class.java.name, "onFragmentResume fragment:${fragment.javaClass}")
+//        LogUtil.e(WechatPlugins::class.java.name, "onFragmentResume fragment:${fragment.javaClass}")
 //        if (fragment.javaClass.name == "com.tencent.mm.plugin.finder.profile.FinderProfileFeedFragment") {
 //
 //
@@ -289,7 +305,7 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
 //    }
 
     private fun enterFinderProfileUI(userName: String,mMActivity:Activity){
-        Log.e(TAG, "enterFinderProfile userName:$userName")
+        LogUtil.e(TAG, "enterFinderProfile userName:$userName")
         val intent = Intent()
         intent.putExtra("finder_username", userName)
         intent.putExtra("from_teen_mode_setting_page", false)
@@ -306,22 +322,50 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
     }
 
     private fun init() {
-        Log.e(TAG, "init AlarmManager")
-        IntervalLoginTask.startInterval()
+        LogUtil.e(TAG, "init AlarmManager")
+        IntervalLoginTask.startInterval(true)
     }
 
 
 
     fun getLoginTask(){
-        val params = mutableMapOf<String, String>()
-        params["brokerCode"] = "100801961"
-        params["platform"] = "soft"
+        val params = mutableMapOf<String, String?>()
+        params["deviceId"] = getWechatAlias()
         ThreadUtil.submitTask{
-            Thread.sleep(2000L)
-            val json = NetWorkUtil.get(Define.getMasterInfo(),params)
-            Log.e(WechatPlugins::class.java.name, "json:$json")
+            Thread.sleep(200L)
+            val json = NetWorkUtil.get(Define.getLoginTask(),params)
+            LogUtil.e(WechatPlugins::class.java.name, "json:$json")
+            val response =
+                mGson.fromJson<BaseResult<ScanQRLoginTask>>(
+                    json.toString(),
+                    genericType<BaseResult<ScanQRLoginTask>>()
+                )
+            if (response.data != null) {
+                ThreadUtil.runOnMainThread {
+                    LogUtil.e(TAG, "getLoginTask response: $response")
+                    openWebViewUI(response.data.qrcodeDecodeRaw?: "")
+                }
+            }
         }
     }
 
+    private fun getWechatAlias():String?{
+        try {
+            val mConfigStorageLogic = "com.tencent.mm.model.z".findClass()
+            LogUtil.e(WechatPlugins::class.java.name, "mConfigStorageLogic:$mConfigStorageLogic")
+            val curAlias = mConfigStorageLogic.callStaticMethod("buA") as String?
+            LogUtil.e(WechatPlugins::class.java.name, "curAlias:$curAlias")
+            val curUsername = mConfigStorageLogic.callStaticMethod("buz")
+            LogUtil.e(WechatPlugins::class.java.name, "curUsername:$curUsername")
+            return if (TextUtils.isEmpty(curAlias)) {
+                curUsername as String
+            } else {
+                curAlias
+            }
+        } catch (e: Error) {
+            e.printStackTrace()
+        }
+        return null
+    }
 
 }

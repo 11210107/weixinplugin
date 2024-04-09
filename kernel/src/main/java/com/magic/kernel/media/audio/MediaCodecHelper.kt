@@ -4,6 +4,7 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.util.Log
+import cc.sdkutil.controller.util.LogUtil
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -26,17 +27,17 @@ class MediaCodecHelper(filePath: String) {
         try {
             mMediaExtractor.setDataSource(filePath)
         } catch (t: Throwable) {
-            Log.e(MediaCodecHelper.javaClass.name, "parseFrom  t1: ${t.message}")
+            LogUtil.e(MediaCodecHelper.javaClass.name, "parseFrom  t1: ${t.message}")
             try {
                 mMediaExtractor.setDataSource(FileInputStream(filePath).fd)
             } catch (t: Throwable) {
-                Log.e(MediaCodecHelper.javaClass.name, "parseFrom  t1: ${t.message}")
+                LogUtil.e(MediaCodecHelper.javaClass.name, "parseFrom  t1: ${t.message}")
             }
         }
 
         // 音频媒体轨道只有一条，大于的则表示不是单一音频
         if (mMediaExtractor.trackCount > 1) {
-            Log.e(MediaCodecHelper.javaClass.name, "parseFrom  trackCount: ${mMediaExtractor.trackCount}")
+            LogUtil.e(MediaCodecHelper.javaClass.name, "parseFrom  trackCount: ${mMediaExtractor.trackCount}")
         }
     }
 
@@ -47,7 +48,7 @@ class MediaCodecHelper(filePath: String) {
                 mSampleRate = mediaFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE)
                 mBitRate = mediaFormat.getInteger(MediaFormat.KEY_BIT_RATE)
             } catch (t: Throwable) {
-                Log.e(MediaCodecHelper.javaClass.name, "initDecoder catch: ${t.message}")
+                LogUtil.e(MediaCodecHelper.javaClass.name, "initDecoder catch: ${t.message}")
             }
             var mime = mediaFormat.getString(MediaFormat.KEY_MIME)
             if (mime.equals("audio/ffmpeg", true)) {
@@ -113,7 +114,7 @@ class MediaCodecHelper(filePath: String) {
                     }
                     if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
                         fileOutputStream.close()
-                        Log.e(MediaCodecHelper::class.java.name, "解码完成: BUFFER_FLAG_END_OF_STREAM")
+                        LogUtil.e(MediaCodecHelper::class.java.name, "解码完成: BUFFER_FLAG_END_OF_STREAM")
                         break
                     }
                 }

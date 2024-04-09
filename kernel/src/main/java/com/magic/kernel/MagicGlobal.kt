@@ -1,6 +1,7 @@
 package com.magic.kernel
 
 import android.util.Log
+import cc.sdkutil.controller.util.LogUtil
 import com.magic.kernel.core.Version
 import com.magic.kernel.core.WaitChannel
 import com.magic.kernel.helper.ParserHelper.ApkFile
@@ -105,7 +106,7 @@ object MagicGlobal {
                 packageName = lpparam.packageName
                 classLoader = lpparam.classLoader
 
-                Log.e(
+                LogUtil.e(
                     MagicGlobal::class.java.name,
                     "init  ${lpparam.appInfo.sourceDir}     ${lpparam.appInfo.publicSourceDir}  \n${version}   ${packageName}  ${classLoader}"
                 )

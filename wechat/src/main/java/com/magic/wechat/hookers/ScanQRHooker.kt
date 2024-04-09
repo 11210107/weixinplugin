@@ -12,7 +12,6 @@ object ScanQRHooker : HookerCenter() {
         get() = listOf(IScanQRHooker::class.java)
 
     override fun provideEventHooker(event: String): Hooker? {
-        Log.e("DYHooker", "IScanQRHooker provideEventHooker $event")
         return when (event) {
             "checkParams" ->
                 iMethodNotifyHooker(

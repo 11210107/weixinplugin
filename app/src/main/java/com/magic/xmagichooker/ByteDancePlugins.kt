@@ -4,12 +4,13 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
+import cc.sdkutil.controller.util.LogUtil
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.magic.kernel.callMethod
+import com.magic.kernel.callStaticMethod
 import com.magic.kernel.findClass
 import com.magic.kernel.getObjectField
 import com.magic.kernel.utils.ThreadUtil
@@ -18,7 +19,6 @@ import com.magic.wechat.hookers.interfaces.IScanQRHooker
 import com.magic.wework.hookers.interfaces.IApplicationHooker
 import com.magic.xmagichooker.model.BaseResult
 import com.magic.xmagichooker.model.ScanQRLoginTask
-import com.magic.xmagichooker.util.ContextUtil
 import com.magic.xmagichooker.util.NetWorkUtil
 import java.lang.ref.WeakReference
 
@@ -33,8 +33,8 @@ object ByteDancePlugins : IActivityHooker, IApplicationHooker, IScanQRHooker {
     }
     val deviceId by lazy {
         mutableMapOf(
-            "6a67cead900200f8" to "352693081166213",
-            "6a67cead900200f9" to "352693081166214"
+            "6a67cead900200f8" to "352693081166214",
+            "6a67cead900200f9" to "352693081166213"
         )
     }
 
@@ -43,26 +43,51 @@ object ByteDancePlugins : IActivityHooker, IApplicationHooker, IScanQRHooker {
     fun setActivity(activity: Activity) {
         mActivityRef = WeakReference(activity)
     }
+
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-        Log.e(TAG, "onActivityCreated   class: ${activity.javaClass}")
-//        if (TextUtils.equals(
-//                activity.javaClass.name,
-//                "com.ss.android.ugc.aweme.openauthorize.AwemeAuthorizedActivity"
-//            ) && !isInit
-//        ) {
+        LogUtil.e(TAG, "onActivityCreated   class: ${activity.javaClass}")
+        if (TextUtils.equals(
+                activity.javaClass.name,
+                "com.ss.android.ugc.aweme.profile.ui.HeaderDetailActivity"
+            )
+        ) {
 //            isInit = true
 //            val intent = activity.callMethod("getIntent")
-//            Log.e(TAG, "onActivityCreated   intent: ${intent}")
+//            LogUtil.e(TAG, "onActivityCreated   intent: ${intent}")
 //            val data = intent?.callMethod("getData")
-//            Log.e(TAG, "onActivityCreated   data: ${data}")
+//            LogUtil.e(TAG, "onActivityCreated   data: ${data}")
 //            val bundle = intent?.callMethod("getExtras")
-//            Log.e(TAG, "onActivityCreated   bundle: ${bundle}")
-//
-//        }
+//            LogUtil.e(TAG, "onActivityCreated   bundle: ${bundle}")
+            getUniqueId()
+        }
 
     }
-    private @Synchronized fun onInit(activity: Any) {
-        Log.e(TAG, "onInit class: ${activity.javaClass.name} isInit:$isInit")
+
+    private fun getUniqueId():String? {
+        val AccountProxyService = "com.ss.android.ugc.aweme.account.AccountProxyService".findClass()
+        val mIAccountService = AccountProxyService.callStaticMethod("get")
+        val mIAccountUserService = mIAccountService?.callMethod("userService")
+
+        val mUser = mIAccountUserService?.callMethod("getCurUser")
+//        LogUtil.e(TAG, "mUser: $mUser")
+        /*LogUtil.e(TAG, "uniqueId: ${mUser?.getObjectField("uniqueId")}")
+        LogUtil.e(TAG, "shortId: ${mUser?.getObjectField("shortId")}")
+        val mCurSecUserId = mIAccountUserService?.callMethod("getCurSecUserId")
+        LogUtil.e(TAG, "mCurSecUserId: $mCurSecUserId")
+        val mCurUserId = mIAccountUserService?.callMethod("getCurUserId")
+        LogUtil.e(TAG, "mCurUserId: $mCurUserId")*/
+        val uniqueId = mUser?.getObjectField("uniqueId") as String?
+        return if (TextUtils.isEmpty(uniqueId)) {
+            mUser?.getObjectField("shortId") as String?
+        }else{
+            uniqueId
+        }
+
+    }
+
+    private @Synchronized
+    fun onInit(activity: Any) {
+        LogUtil.e(TAG, "onInit class: ${activity.javaClass.name} isInit:$isInit")
         synchronized(this) {
             if (!isInit && (activity.javaClass.name == "com.ss.android.ugc.aweme.main.MainActivity")) {
                 isInit = true
@@ -72,35 +97,36 @@ object ByteDancePlugins : IActivityHooker, IApplicationHooker, IScanQRHooker {
     }
 
     private fun initDouyin() {
-        Log.e(TAG, "initDouyin startInterval:")
-        IntervalLoginTask.startInterval()
+        LogUtil.e(TAG, "initDouyin startInterval:")
+        IntervalLoginTask.startInterval(false)
     }
 
-    fun getLoginTask(){
-        val androidId =
-            Settings.Secure.getString(ContextUtil.weChatApplication.contentResolver, Settings.Secure.ANDROID_ID)
-        Log.e(TAG, "getLoginTask   androidId: ${androidId}")
-        ThreadUtil.submitTask{
+    fun getLoginTask() {
+        LogUtil.e(TAG, "getLoginTask:")
+        val byteDanceParams = mutableMapOf<String, String?>()
+        byteDanceParams["deviceId"] = getUniqueId()
+        ThreadUtil.submitTask {
             Thread.sleep(200L)
-            val task = NetWorkUtil.get(Define.getLoginTask(), mutableMapOf<String,String>(), deviceId[androidId])
+            val task = NetWorkUtil.get(
+                Define.getLoginTask(),
+                byteDanceParams
+            )
             val response =
-                mGson.fromJson<BaseResult<ScanQRLoginTask>>(task.toString(), genericType<BaseResult<ScanQRLoginTask>>())
+                mGson.fromJson<BaseResult<ScanQRLoginTask>>(
+                    task.toString(),
+                    genericType<BaseResult<ScanQRLoginTask>>()
+                )
             if (response.data != null) {
                 ThreadUtil.runOnMainThread {
-                    Log.e(TAG, "getLoginTask   response: $response")
-                    startAwemeAuthActivity(response.data.qrcodeDecodeRaw?:"")
+                    LogUtil.e(TAG, "getLoginTask   response: $response")
+                    startAwemeAuthActivity(response.data.qrcodeDecodeRaw ?: "")
                 }
             }
-            Log.e(TAG, "getLoginTask   task: ${task}")
-            val params = mutableMapOf<String, String>()
-            params["brokerCode"] = "100801961"
-            params["platform"] = "soft"
-            val json = NetWorkUtil.get(Define.getMasterInfo(),params)
-            Log.e(TAG, "json:$json")
         }
     }
+
     override fun onActivityResumed(activity: Activity) {
-        Log.e(TAG, "onActivityResumed   class: ${activity.javaClass}")
+        LogUtil.e(TAG, "onActivityResumed   class: ${activity.javaClass}")
         onInit(activity)
         setActivity(activity)
     }
@@ -111,33 +137,33 @@ object ByteDancePlugins : IActivityHooker, IApplicationHooker, IScanQRHooker {
         bundle3.putBoolean("show_switch_account_dialog", false)
         bundle3.putBoolean("not_skip_confirm", true)
         bundle.putBundle("_bytedance_params_extra", bundle3)
-        Log.e(TAG, "checkParams   json: ${bundle}")
+        LogUtil.e(TAG, "checkParams   json: ${bundle}")
         val authLevelViewModel = activity.getObjectField("authLevelViewModel")
-        Log.e(TAG, "checkParams   authLevelViewModel: ${authLevelViewModel}")
+        LogUtil.e(TAG, "checkParams   authLevelViewModel: ${authLevelViewModel}")
         val LIZIZ = authLevelViewModel?.callMethod("LIZIZ")
-        Log.e(TAG, "checkParams1   LIZIZ: ${LIZIZ}")
+        LogUtil.e(TAG, "checkParams1   LIZIZ: ${LIZIZ}")
         val LIZJBundle = LIZIZ?.getObjectField("LIZJ")
-        Log.e(TAG, "checkParams1   LIZIZBundle: ${LIZJBundle}")
+        LogUtil.e(TAG, "checkParams1   LIZIZBundle: ${LIZJBundle}")
 
     }
 
     override fun onAuthSuccess(activity: Activity, response: Any) {
-        Log.e(TAG, "onAuthSuccess   response: ${mGson.toJson(response)}")
+        LogUtil.e(TAG, "onAuthSuccess   response: ${mGson.toJson(response)}")
     }
 
     override fun onAuthFailed(activity: Activity, response: Any) {
-        Log.e(TAG, "onAuthFailed   response: ${mGson.toJson(response)}")
+        LogUtil.e(TAG, "onAuthFailed   response: ${mGson.toJson(response)}")
     }
 
     override fun sendResponse(activity: Activity, response: Any) {
-        Log.e(TAG, "sendResponse   response: ${mGson.toJson(response)}")
+        LogUtil.e(TAG, "sendResponse   response: ${mGson.toJson(response)}")
     }
 
     override fun sendResult(activity: Activity, response: Any) {
-        Log.e(TAG, "sendResult   response: ${mGson.toJson(response)}")
+        LogUtil.e(TAG, "sendResult   response: ${mGson.toJson(response)}")
     }
 
-    private fun startAwemeAuthActivity(qrCodeUrl:String) {
+    private fun startAwemeAuthActivity(qrCodeUrl: String) {
         val intent2 = Intent(
             mActivityRef?.get(),
             "com.ss.android.ugc.aweme.openauthorize.AwemeAuthorizedActivity".findClass()
@@ -150,15 +176,15 @@ object ByteDancePlugins : IActivityHooker, IApplicationHooker, IScanQRHooker {
             )
         )
         intent2.data = uri
-        Log.e(TAG, "onActivityCreated   intent2-1: ${intent2}")
+        LogUtil.e(TAG, "onActivityCreated   intent2-1: ${intent2}")
         val clientKey = uri.getQueryParameter("client_key")
-        Log.e(TAG, "onActivityCreated   clientKey: ${clientKey}")
+        LogUtil.e(TAG, "onActivityCreated   clientKey: ${clientKey}")
         val qr_source_aid = uri.getQueryParameter("qr_source_aid")
-        Log.e(TAG, "onActivityCreated   qr_source_aid: ${qr_source_aid}")
+        LogUtil.e(TAG, "onActivityCreated   qr_source_aid: ${qr_source_aid}")
         val scopes = uri.getQueryParameter("scopes")
-        Log.e(TAG, "onActivityCreated   scopes: ${scopes}")
+        LogUtil.e(TAG, "onActivityCreated   scopes: ${scopes}")
         val token = uri.getQueryParameter("token")
-        Log.e(TAG, "onActivityCreated   token: ${token}")
+        LogUtil.e(TAG, "onActivityCreated   token: ${token}")
         val bundle2 = Bundle()
         bundle2.putString("key_qrcode_token", token)
         bundle2.putInt("wap_requested_orientation", -1)
@@ -184,9 +210,10 @@ object ByteDancePlugins : IActivityHooker, IApplicationHooker, IScanQRHooker {
             "{\"verify_openid\":\"\",\"verify_scope\":\"\"}"
         )
         intent2.putExtras(bundle2)
-        Log.e(TAG, "onActivityCreated intent2: ${intent2}")
-        Log.e(TAG, "onActivityCreated bundle2: ${bundle2}")
+        LogUtil.e(TAG, "onActivityCreated intent2: ${intent2}")
+        LogUtil.e(TAG, "onActivityCreated bundle2: ${bundle2}")
         mActivityRef?.get()?.startActivity(intent2)
     }
 }
+
 inline fun <reified T> genericType() = object : TypeToken<T>() {}.type

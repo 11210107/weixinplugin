@@ -5,4 +5,6 @@
         <item>com.tencent.mm</item>
         <item>com.ss.android.ugc.aweme</item>
     </string-array>
+    <string name="notification_content">XMagic守护服务</string>
+    <string name="notification_sub_content">XMagic守护运行中</string>
 </resources>

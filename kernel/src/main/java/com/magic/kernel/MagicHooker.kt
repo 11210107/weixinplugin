@@ -3,6 +3,7 @@ package com.magic.kernel
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import cc.sdkutil.controller.util.LogUtil
 import com.magic.kernel.core.HookerCenter
 import com.magic.kernel.core.IHookerProvider
 import com.magic.kernel.core.Version
@@ -78,7 +79,7 @@ object MagicHooker {
                     registerHookers(plugins)
                 }
                 else ->
-                    Log.e(MagicHooker::class.java.name, "查找初始化企微失败")
+                    LogUtil.e(MagicHooker::class.java.name, "查找初始化企微失败")
             }
         }
     }

@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Process
 import android.text.TextUtils
 import android.util.Log
+import cc.sdkutil.controller.util.LogUtil
 import com.magic.kernel.MagicHooker
 import com.magic.kernel.helper.TryHelper.tryVerbosely
 import com.magic.shared.apis.SharedEngine
@@ -27,7 +28,7 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
     private val BYTE_DANCE_PACKAGE = "com.ss.android.ugc.aweme"
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
-        Log.e(Hooker::class.java.name, "handleLoadPackage   ${lpparam.processName}")
+        LogUtil.e(Hooker::class.java.name, "handleLoadPackage   ${lpparam.processName}")
         tryVerbosely {
             when (lpparam.packageName) {
                 TARGET_PACKAGE ->
@@ -49,7 +50,7 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
     }
 
     override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam?) {
-        Log.e(Hooker::class.java.name, "initZygote   ${startupParam?.modulePath}   ${startupParam?.startsSystemServer}")
+        LogUtil.e(Hooker::class.java.name, "initZygote   ${startupParam?.modulePath}   ${startupParam?.startsSystemServer}")
     }
 
     private fun hookAttachBaseContext(classLoader: ClassLoader, callback: (Context) -> Unit) {
@@ -60,7 +61,7 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
             Context::class.java,
             object : XC_MethodHook() {
                 override fun afterHookedMethod(param: MethodHookParam?) {
-                    Log.e(Hooker::class.java.name, "hookAttachBaseContext callback")
+                    LogUtil.e(Hooker::class.java.name, "hookAttachBaseContext callback")
                     callback(param?.thisObject as? Application ?: return)
                 }
             })
@@ -75,8 +76,8 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
     }
 
     private fun hookTencent(lpparam: XC_LoadPackage.LoadPackageParam, context: Context) {
-        Log.e(Hooker::class.java.name, "lpparam.packageName:${lpparam.packageName}")
-        Log.e(Hooker::class.java.name, "lpparam.processName:${lpparam.processName}")
+        LogUtil.e(Hooker::class.java.name, "lpparam.packageName:${lpparam.packageName}")
+        LogUtil.e(Hooker::class.java.name, "lpparam.processName:${lpparam.processName}")
         when (lpparam.packageName) {
             "com.tencent.wework" -> {
                 MagicHooker.startup(
@@ -86,9 +87,9 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
                 )
             }
             "com.tencent.mm" -> {
-                Log.e(Hooker::class.java.name, "开始启动个人微信插件")
+                LogUtil.e(Hooker::class.java.name, "开始启动个人微信插件")
                 val processName = getProcessName(MagicHooker.getSystemContext())
-                Log.e(Hooker::class.java.name, "processName:$processName")
+                LogUtil.e(Hooker::class.java.name, "processName:$processName")
                 if (TextUtils.equals("com.tencent.mm", processName)) {
                     //主进程hook
                 }
@@ -102,13 +103,13 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
     }
 
     private fun hookByteDance(lpparam: XC_LoadPackage.LoadPackageParam){
-        Log.e(Hooker::class.java.name, "lpparam.packageName:${lpparam.packageName}")
-        Log.e(Hooker::class.java.name, "lpparam.processName:${lpparam.processName}")
+        LogUtil.e(Hooker::class.java.name, "lpparam.packageName:${lpparam.packageName}")
+        LogUtil.e(Hooker::class.java.name, "lpparam.processName:${lpparam.processName}")
         when (lpparam.processName) {
             "com.ss.android.ugc.aweme" ->{
-                Log.e(Hooker::class.java.name, "开始启动抖音插件")
+                LogUtil.e(Hooker::class.java.name, "开始启动抖音插件")
                 val processName = getProcessName(MagicHooker.getSystemContext())
-                Log.e(Hooker::class.java.name, "mainProcessName:$processName")
+                LogUtil.e(Hooker::class.java.name, "mainProcessName:$processName")
                 if (TextUtils.equals("com.ss.android.ugc.aweme", processName)) {
                     //主进程hook
                     MagicHooker.startup(
