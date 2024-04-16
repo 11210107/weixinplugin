@@ -125,13 +125,13 @@ object FinderLiveHookers:HookerCenter() {
 //                    needObject = false,
 //                    parameterTypes = *arrayOf(Clazz.Boolean,Clazz.Boolean)
 //                )
-            "b" ->
+            "onPageFinished" ->
                 iMethodNotifyHooker(
                     clazz = "com.tencent.mm.plugin.webview.ui.tools.WebViewUI".findClass(),
                     method = "b",
                     iClazz = IFinderLiveHooker::class.java,
-                    iMethodBefore = "b",
-                    needObject = false,
+                    iMethodBefore = "onPageFinished",
+                    needObject = true,
                     parameterTypes = *arrayOf("com.tencent.xweb.WebView".findClass(),Clazz.String)
                 )
             else -> throw IllegalArgumentException("Unknown event: $event")

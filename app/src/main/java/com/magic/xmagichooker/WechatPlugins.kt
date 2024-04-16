@@ -3,20 +3,12 @@
 package com.magic.xmagichooker
 
 import android.app.Activity
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
-import android.provider.Settings.Global
 import android.text.TextUtils
-import android.util.Log
-import android.view.WindowManager
 import cc.sdkutil.controller.util.LogUtil
 import com.google.gson.Gson
-import com.magic.kernel.MagicGlobal
 import com.magic.kernel.callMethod
 import com.magic.kernel.callStaticMethod
 import com.magic.kernel.findClass
@@ -27,11 +19,8 @@ import com.magic.wechat.hookers.interfaces.IFinderLiveHooker
 import com.magic.wework.hookers.interfaces.IApplicationHooker
 import com.magic.xmagichooker.model.BaseResult
 import com.magic.xmagichooker.model.ScanQRLoginTask
-import com.magic.xmagichooker.util.ContextUtil
 import com.magic.xmagichooker.util.NetWorkUtil
-import java.util.Timer
-import java.util.TimerTask
-import kotlin.concurrent.timerTask
+
 
 object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
     val TAG = WechatPlugins::class.java.simpleName
@@ -40,6 +29,12 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
     }
     var loadLiveInfo = false
     var isInit = false
+    val finder_account_key = "webview_key_user"
+    val mmkv by lazy {
+        val MultiProcessMMKV = "com.tencent.mm.sdk.platformtools.MultiProcessMMKV".findClass()
+        LogUtil.e(WechatPlugins::class.java.name, "MultiProcessMMKV:$MultiProcessMMKV")
+        MultiProcessMMKV.callStaticMethod("getMMKV", "WebViewFontUtil")
+    }
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
         LogUtil.e(WechatPlugins::class.java.name, "onActivityCreated   class: ${activity.javaClass}")
         if (activity.javaClass.name == WechatClass.FinderLiveVisitorAffinityUI.name) {
@@ -64,7 +59,6 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
 
         }
         if (activity.javaClass.name == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {
-
         }
         if (activity.javaClass.name == "com.tencent.mm.plugin.fts.ui.FTSMainUI") {
             if (!loadLiveInfo) {
@@ -92,17 +86,49 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
         onInit(activity)
     }
 
-    override fun b(WebView:Any,url: String) {
-        LogUtil.e(WechatPlugins::class.java.name, "WebView b $url")
-        val js = "javascript:document.querySelector('.confirm .weui-btn.weui-btn_primary').click()"
-        ThreadUtil.runOnMainThread({
-            LogUtil.e(WechatPlugins::class.java.name, "WebView evaluateJavascript")
-            WebView.callMethod("evaluateJavascript",js,null)
-            LogUtil.e(WechatPlugins::class.java.name, "WebView evaluateJavascript")
-        },3000L)
+
+
+
+    override fun onPageFinished(WebViewUI:Activity,WebView:Any,url: String) {
+        LogUtil.e(WechatPlugins::class.java.name, "WebView onPageFinished $url")
+        if (url.startsWith(Define.wechat_login_url)) {
+            val finder_account = mmkv?.callMethod("decodeString","webview_key_user")
+            LogUtil.e(WechatPlugins::class.java.name, "WebView finderAccount $finder_account")
+//        val js = "javascript:document.querySelector('.confirm .weui-btn.weui-btn_primary').click()"
+//        val js = "javascript:document.querySelectorAll('.multi-confirm .confirm-finder-list .confirm-item .confirm-name .name-content')"
+//        val js = "javascript:window.Android.showToast('Hello!')"
+            val js = "javascript:document.querySelectorAll('.multi-confirm .confirm-finder-list .confirm-item .confirm-name .name-content').forEach(item => {\n" +
+                    "  if(item.innerText === '$finder_account'){\n" +
+                    "    item.click()\n" +
+                    "  }\n" +
+                    "})"
+            LogUtil.e(WechatPlugins::class.java.name, "WebView js $js")
+            ThreadUtil.runOnMainThread({
+                LogUtil.e(WechatPlugins::class.java.name, "WebView before evaluateJavascript")
+                /*val valueCallback2 = object :ValueCallback<String>{
+                    override fun onReceiveValue(args: String?) {
+                        LogUtil.e(WechatPlugins::class.java.name, "WebView ValueCallback2 args: ${args}")
+                    }
+
+                }
+                WebView.callMethod("addJavascriptInterface",WechatJavascriptInterface(),"Android")*/
+                WebView.callMethod("evaluateJavascript",js,null)
+                LogUtil.e(WechatPlugins::class.java.name, "WebView after evaluateJavascript")
+                ThreadUtil.runOnMainThread({
+                    LogUtil.e(WechatPlugins::class.java.name, "WebViewUI finish")
+                    WebViewUI.callMethod("finish")
+                },3000L)
+            },3000L)
+
+        }
+
 
     }
-    private fun openWebViewUI(url:String) {
+
+
+    private fun openWebViewUI(url:String,account:String) {
+        mmkv?.callMethod("putString", finder_account_key, account)
+        mmkv?.callMethod("apply")
         val intent = Intent()
 //        intent.putExtra("rawUrl", "https://channels.weixin.qq.com/mobile/confirm_login.html?token=${token}")
         intent.putExtra("rawUrl", url)
@@ -340,10 +366,12 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
                     json.toString(),
                     genericType<BaseResult<ScanQRLoginTask>>()
                 )
-            if (response.data != null) {
+            val scanQRLoginTask = response.data
+            if (scanQRLoginTask != null) {
                 ThreadUtil.runOnMainThread {
                     LogUtil.e(TAG, "getLoginTask response: $response")
-                    openWebViewUI(response.data.qrcodeDecodeRaw?: "")
+                    LogUtil.e(TAG, "getLoginTask extra: ${scanQRLoginTask?.extra?.selectorName}")
+                    openWebViewUI(scanQRLoginTask.qrcodeDecodeRaw?: "",scanQRLoginTask?.extra?.selectorName ?: "")
                 }
             }
         }

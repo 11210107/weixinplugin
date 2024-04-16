@@ -62,10 +62,18 @@ class MainActivity : AppCompatActivity() {
         }
         val application = ContextUtil.get()
         btn_start_aweme.setOnClickListener {
-            TransferUtil.openAwemeAPP(application)
+//            TransferUtil.openAwemeAPP(application)
+            btn_start_aweme.postDelayed({
+                LogUtil.d(TAG,"openAweme ")
+                TransferUtil.openAwemeAPP(application)
+            },3000L)
         }
         btn_start_wechat.setOnClickListener {
-            TransferUtil.openWeChat(application)
+            btn_start_wechat.postDelayed({
+                LogUtil.d(TAG,"openWechat ")
+                TransferUtil.openWeChat(application)
+            },3000L)
+
         }
         btn_start_interval_task.setOnClickListener {
             val intent = Intent(application, ForegroundCoreService::class.java)

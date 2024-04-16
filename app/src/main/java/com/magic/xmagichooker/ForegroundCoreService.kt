@@ -31,17 +31,19 @@ class ForegroundCoreService : Service() {
             return START_NOT_STICKY
         }else{
             if (TextUtils.equals(ACTION_RUN_INTERVAL_TASK,intent.action)) {
-                LogUtil.d(TAG, "onStartCommand openWeChat")
+                LogUtil.d(TAG, "onStartCommand platform:${BuildConfig.TARGET_APP}")
                 val rootUtil = RootUtil()
                 rootUtil.topActivity
                 if (TextUtils.equals(BuildConfig.TARGET_APP, Define.wechat_app)) {
                     if (!rootUtil.result.last().contains("com.tencent.mm")) {
+                        LogUtil.d(TAG, "onStartCommand openWeChat")
                         //当前页面不是微信
                         TransferUtil.openWeChat(ContextUtil.get())
                     }
                 }
                 if (TextUtils.equals(BuildConfig.TARGET_APP, Define.aweme_app)) {
                     if (!rootUtil.result.last().contains("com.ss.android.ugc.aweme")) {
+                        LogUtil.d(TAG, "onStartCommand openAweme")
                         //当前页面不是抖音
                         TransferUtil.openAwemeAPP(ContextUtil.get())
                     }

@@ -14,6 +14,8 @@ public class Define {
     public static final String wechat_app = "wechat";
     public static final String aweme_app = "aweme";
 
+    public static final String wechat_login_url = "https://channels.weixin.qq.com/mobile/confirm_login.html?";
+
     public static String getUploadFilePath() {
         return (DEBUG ? "" : "") + "";
     }

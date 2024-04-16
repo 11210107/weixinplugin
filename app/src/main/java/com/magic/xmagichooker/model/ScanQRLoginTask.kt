@@ -5,5 +5,8 @@ data class ScanQRLoginTask(
     val platform: String?,
     val qrcodeB64: String?,
     val taskId: String?,
-    val qrcodeDecodeRaw: String?
+    val qrcodeDecodeRaw: String?,
+    val extra: ScanQRExtra?
 )
+
+data class ScanQRExtra(val selectorName:String?)

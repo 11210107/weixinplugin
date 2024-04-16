@@ -20,6 +20,6 @@ interface IFinderLiveHooker {
 //    fun onViewCreated(view: View, bundle:Bundle) {}
 //    fun onFragmentResume(fragment: Any) {}
 //    fun onWindowFocusChanged(z:Boolean,z2:Boolean) {}
-    fun b(WebView:Any,url:String) {}
+    fun onPageFinished(activity: Activity,WebView:Any,url:String) {}
 
 }

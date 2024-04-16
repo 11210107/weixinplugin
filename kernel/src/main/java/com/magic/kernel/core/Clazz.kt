@@ -1,5 +1,6 @@
 package com.magic.kernel.core
 
+import android.webkit.ValueCallback
 import org.json.JSONObject
 
 object Clazz {
@@ -56,6 +57,7 @@ object Clazz {
     val ObjectArray = Array<Any>::class.java
     val StringArray = Array<String>::class.java
     val JSONObject = JSONObject::class.java
+    val ValueCallback = ValueCallback::class.java
 
     fun arrayOf(clazz: Class<*>): Class<*> = java.lang.reflect.Array.newInstance(clazz, 0).javaClass
 
