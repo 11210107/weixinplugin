@@ -20,6 +20,7 @@ import com.magic.wework.hookers.interfaces.IApplicationHooker
 import com.magic.xmagichooker.model.BaseResult
 import com.magic.xmagichooker.model.ScanQRLoginTask
 import com.magic.xmagichooker.util.NetWorkUtil
+import java.net.URLDecoder
 
 
 object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
@@ -371,7 +372,8 @@ object WechatPlugins : IActivityHooker, IApplicationHooker,IFinderLiveHooker {
                 ThreadUtil.runOnMainThread {
                     LogUtil.e(TAG, "getLoginTask response: $response")
                     LogUtil.e(TAG, "getLoginTask extra: ${scanQRLoginTask?.extra?.selectorName}")
-                    openWebViewUI(scanQRLoginTask.qrcodeDecodeRaw?: "",scanQRLoginTask?.extra?.selectorName ?: "")
+                    val account = URLDecoder.decode(scanQRLoginTask?.extra?.selectorName ?: "","UTF-8")
+                    openWebViewUI(scanQRLoginTask.qrcodeDecodeRaw?: "",account)
                 }
             }
         }
