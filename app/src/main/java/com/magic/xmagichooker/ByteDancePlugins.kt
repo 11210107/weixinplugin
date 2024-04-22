@@ -144,7 +144,9 @@ object ByteDancePlugins : IActivityHooker, IApplicationHooker, IScanQRHooker {
         LogUtil.e(TAG, "checkParams1   LIZIZ: ${LIZIZ}")
         val LIZJBundle = LIZIZ?.getObjectField("LIZJ")
         LogUtil.e(TAG, "checkParams1   LIZIZBundle: ${LIZJBundle}")
-
+        ThreadUtil.runOnMainThread({
+            activity.callMethod("finish")
+        },5000L)
     }
 
     override fun onAuthSuccess(activity: Activity, response: Any) {
