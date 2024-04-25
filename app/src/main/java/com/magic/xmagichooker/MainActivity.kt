@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import cc.sdkutil.controller.util.LogUtil
 import com.magic.kernel.utils.CmdUtil
@@ -85,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                 alarmManager.cancel(pendingIntent)
                 alarmManager.setRepeating(
                     AlarmManager.RTC_WAKEUP,
-                    System.currentTimeMillis() + Define.INTERVAL_CYCLE,
+                    System.currentTimeMillis(),
                     Define.INTERVAL_CYCLE,
                     pendingIntent
                 )
@@ -93,8 +92,9 @@ class MainActivity : AppCompatActivity() {
                 LogUtil.e(TAG, "alarmManager is null !!!")
             }
         }
-    }
 
+
+    }
 
 
     override fun onResume() {

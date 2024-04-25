@@ -30,6 +30,8 @@ public class RootUtil {
     private static final String CMD_SILENCE_ENABLE = "pm enable ";
     private static final String CMD_REBOOT = "reboot";
     private static final String TOP_ACTIVITY = "dumpsys activity top | grep ACTIVITY";
+
+    private static final String GO_BACK = "input keyevent KEYCODE_BACK";
     private static final String CMD_REMOUNT_READ_WRITE = "mount -o rw,remount";
     private static final String CMD_CP_FILE = "cp -r ";
     private static final String CMD_MOVE_FILE = "mv ";
@@ -222,6 +224,12 @@ public class RootUtil {
         boolean reboot = rootCommand(TOP_ACTIVITY);
         LogUtil.INSTANCE.d(TAG,"getTopActivity res:"+reboot);
         return reboot;
+    }
+    public boolean getGoBack(){
+        LogUtil.INSTANCE.d(TAG,"getGoBack ");
+        boolean goback = rootCommand(GO_BACK);
+        LogUtil.INSTANCE.d(TAG,"getGoBack res:"+goback);
+        return goback;
     }
 
     /**
