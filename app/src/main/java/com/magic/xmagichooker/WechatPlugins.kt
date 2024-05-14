@@ -6,6 +6,7 @@ import android.app.Activity
 import android.app.Instrumentation
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.KeyEvent
@@ -20,10 +21,13 @@ import com.magic.shared.hookers.interfaces.IActivityHooker
 import com.magic.wechat.hookers.interfaces.IFinderLiveHooker
 import com.magic.wework.hookers.interfaces.IApplicationHooker
 import com.magic.xmagichooker.model.BaseResult
+import com.magic.xmagichooker.model.FinderList
 import com.magic.xmagichooker.model.ScanQRLoginTask
+import com.magic.xmagichooker.model.TencentBaseResult
 import com.magic.xmagichooker.util.NetWorkUtil
 import java.lang.ref.WeakReference
 import java.net.URLDecoder
+import java.net.URLEncoder
 
 
 object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
@@ -74,6 +78,7 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
     override fun onPageFinished(WebViewUI: Activity, WebView: Any, url: String) {
         LogUtil.e(WechatPlugins::class.java.name, "WebView onPageFinished $url")
         if (url.startsWith(Define.wechat_login_url)) {
+            submitFinderAccount(url)
             mmkv?.callMethod("putInt", webview_open_key, 1)
             mmkv?.callMethod("apply")
             val finder_account = mmkv?.callMethod("decodeString", "webview_key_user")
@@ -119,6 +124,33 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
                 }, 3000L)
             }, 3000L)
 
+        }
+
+
+    }
+
+    private fun submitFinderAccount(url: String) {
+        val uri = Uri.parse(url)
+        val token = uri.getQueryParameter("token")
+        val exportkey = uri.getQueryParameter("exportkey")
+        LogUtil.e(TAG, "WebView submitFinderAccount token: $token")
+        LogUtil.e(TAG, "WebView submitFinderAccount exportkey: $exportkey")
+        val params = mutableMapOf(
+            "token" to URLEncoder.encode(token,"UTF-8"),
+            "exportKey" to URLEncoder.encode(exportkey,"UTF-8"),
+            "exportkey" to URLEncoder.encode(exportkey,"UTF-8")
+        )
+        ThreadUtil.submitTask {
+            Thread.sleep(2000)
+            val json = NetWorkUtil.postByUrlParams(Define.getFinderList(),params,"")
+            val result = mGson.fromJson<TencentBaseResult<FinderList>>(
+                json.toString(),
+                genericType<TencentBaseResult<FinderList>>()
+            )
+            if (result.isSuccess) {
+
+            }
+            LogUtil.e(TAG,"result: ${result}")
         }
 
 

@@ -380,7 +380,52 @@ public class NetWorkUtil {
     public static JSONObject get(String path, Object o) {
         return get(path, o, "");
     }
+    /**
+     * @param path String 请求地址
+     * @return JSONObject 请求响应值
+     */
+    public static JSONObject postByUrlParams(String path, Object o, String mmDataPath) {
+        String params = objectToGetString(o);
+        LogUtil.INSTANCE.d(TAG, params);
+        HttpURLConnection conn = getHttpUrlConnection(path + "?" + params, HTTP_PARAMS.POST, mmDataPath);
+        if (conn == null) {
+            LogUtils.e(TAG, "网络错误 conn is null !!!");
+            return null;
+        }
+        String postRes = "";
+        try {
+            conn.connect();
 
+            int responseCode = conn.getResponseCode();
+            LogUtils.i(TAG, "url: " + path + " post responseCode:" + responseCode);
+            if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
+                InputStream in = conn.getInputStream();
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                byte[] bytes = new byte[1024];
+                int len;
+                while ((len = in.read(bytes)) != -1) {
+                    os.write(bytes, 0, len);
+                }
+                postRes = new String(os.toByteArray());
+                LogUtils.i(TAG, "url: " + path + " post res:" + postRes);
+                in.close();
+                os.close();
+                conn.disconnect();
+                return new JSONObject(postRes);
+            }
+        } catch (IOException e) {
+            if (isConnected()) {
+                LogUtils.e(TAG, "post error:" + e.getMessage() + "\n postRes: " + postRes);
+            }
+            LogUtils.e(TAG, "post error:" + e.getMessage());
+            e.printStackTrace();
+        } catch (JSONException e) {
+            LogUtils.e(TAG, "post error:" + e.getMessage());
+            LogUtils.e(TAG, "post error:" + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     /**
      * @param path String 请求地址
@@ -610,10 +655,10 @@ public class NetWorkUtil {
             conn.setUseCaches(false);
             conn.setRequestProperty("Charset", "UTF-8");
 //            conn.setRequestProperty("protectKey", Define.getProtectKey());
-            conn.setRequestProperty("bussDep", getChannel() + "");
-            conn.setRequestProperty("packageName", ContextUtil.INSTANCE.getWeWorkApplication().getPackageName());
-            conn.setRequestProperty("versionName", getVersionName());
-            conn.setRequestProperty("versionCode", getVersionCode() + "");
+//            conn.setRequestProperty("bussDep", getChannel() + "");
+//            conn.setRequestProperty("packageName", ContextUtil.INSTANCE.getWeWorkApplication().getPackageName());
+//            conn.setRequestProperty("versionName", getVersionName());
+//            conn.setRequestProperty("versionCode", getVersionCode() + "");
             if (!TextUtils.isEmpty(mmDataPth)) {
                 conn.setRequestProperty("mmDataPath", mmDataPth);
                 conn.setRequestProperty("DeviceId", mmDataPth);
@@ -621,6 +666,7 @@ public class NetWorkUtil {
 //                conn.setRequestProperty("versionName",getVersionName());
 //                conn.setRequestProperty("versionCode",getVersionCode()+"");
             }
+            LogUtil.INSTANCE.d(TAG,"set http_params: " + http_params);
             if (http_params != null) {
                 switch (http_params) {
                     case UPLOAD:
@@ -663,11 +709,17 @@ public class NetWorkUtil {
             HashMap<String, Object> map = (HashMap<String, Object>) object;
             Set<Map.Entry<String, Object>> entries = map.entrySet();
             StringBuilder sb = new StringBuilder();
+            int index = 0;
             for (Map.Entry<String, Object> next : entries) {
                 String name = next.getKey();
                 Object value = next.getValue();
                 Object o1 = objectToJson(value);
-                sb.append("&").append(name).append("=").append(o1.toString());
+                if (index == 0) {
+                    sb.append(name).append("=").append(o1.toString());
+                }else {
+                    sb.append("&").append(name).append("=").append(o1.toString());
+                }
+                index++;
             }
             return sb.toString();
         } else {

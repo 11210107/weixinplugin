@@ -13,6 +13,8 @@ public class Define {
 
     public static final String wechat_app = "wechat";
     public static final String aweme_app = "aweme";
+    public static final String TASK_SCAN_QR_CODE = "scanQrcode";
+    public static final String TASK_SUBMIT_FINDER_LIST = "uploadAccountList";
 
     public static final String wechat_login_url = "https://channels.weixin.qq.com/mobile/confirm_login.html?";
 
@@ -25,5 +27,8 @@ public class Define {
     }
     public static String getLoginTask(){
         return "http://mcnspider.aliyun-sh-internal.liduoxing.cn:8000/task/get";
+    }
+    public static String getFinderList(){
+        return "https://channels.weixin.qq.com/cgi-bin/mmfinderassistant-bin/auth/scan-qrcode";
     }
 }
