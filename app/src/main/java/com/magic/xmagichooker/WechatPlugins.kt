@@ -24,6 +24,7 @@ import com.magic.xmagichooker.model.BaseResult
 import com.magic.xmagichooker.model.FinderList
 import com.magic.xmagichooker.model.ScanQRLoginTask
 import com.magic.xmagichooker.model.TencentBaseResult
+import com.magic.xmagichooker.model.UploadResponse
 import com.magic.xmagichooker.util.NetWorkUtil
 import java.lang.ref.WeakReference
 import java.net.URLDecoder
@@ -39,6 +40,8 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
     var isInit = false
     val finder_account_key = "webview_key_user"
     val webview_open_key = "webview_open_key"
+    val webview_open_task = "webview_open_task"
+    val webview_open_alias = "webview_open_alias"
     val mmkv by lazy {
         val MultiProcessMMKV = "com.tencent.mm.sdk.platformtools.MultiProcessMMKV".findClass()
         LogUtil.e(WechatPlugins::class.java.name, "MultiProcessMMKV:$MultiProcessMMKV")
@@ -78,51 +81,62 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
     override fun onPageFinished(WebViewUI: Activity, WebView: Any, url: String) {
         LogUtil.e(WechatPlugins::class.java.name, "WebView onPageFinished $url")
         if (url.startsWith(Define.wechat_login_url)) {
-            submitFinderAccount(url)
             mmkv?.callMethod("putInt", webview_open_key, 1)
             mmkv?.callMethod("apply")
-            val finder_account = mmkv?.callMethod("decodeString", "webview_key_user")
-            LogUtil.e(WechatPlugins::class.java.name, "WebView finderAccount $finder_account")
-            /*val js =
-                "javascript:document.querySelector('.confirm .weui-btn.weui-btn_primary').click()"
-            val js =
-                "javascript:document.querySelectorAll('.multi-confirm .confirm-finder-list .confirm-item .confirm-name .name-content')"
-            val js = "javascript:window.Android.showToast('Hello!')"
-            val js =
-                "javascript:document.querySelectorAll('.multi-confirm .confirm-finder-list .confirm-item .confirm-name .name-content').forEach(item => {\n" +
-                        "  if(item.innerText === '$finder_account'){\n" +
-                        "    item.click()\n" +
-                        "  }\n" +
-                        "})"*/
-            val js =
-                "document.querySelectorAll('.multi-confirm .confirm-finder-list .confirm-item .confirm-name .name-content').forEach(item => {\n" +
-                        "  if(item.innerText === '$finder_account'){\n" +
-                        "    item.scrollIntoView({\n" +
-                        "      behavior: \"smooth\",\n" +
-                        "      block:\"center\"\n" +
-                        "    })\n" +
-                        "    setTimeout(() => {\n" +
-                        "      item.click()\n" +
-                        "    }, 1000)\n" +
-                        "  }\n" +
-                        "})"
-            LogUtil.e(WechatPlugins::class.java.name, "WebView js $js")
-            ThreadUtil.runOnMainThread({
-                LogUtil.e(WechatPlugins::class.java.name, "WebView before evaluateJavascript")
-                /*val valueCallback2 = object :ValueCallback<String>{
-                    override fun onReceiveValue(args: String?) {
-                        LogUtil.e(WechatPlugins::class.java.name, "WebView ValueCallback2 args: ${args}")
-                    }
+            val taskType = mmkv?.callMethod("decodeString", "webview_open_task")
+            when (taskType) {
+                Define.TASK_SUBMIT_FINDER_LIST -> {
+                    submitFinderAccount(url)
+                    ThreadUtil.runOnMainThread({
+                        LogUtil.e(WechatPlugins::class.java.name, "WebViewUI finish")
+                        WebViewUI.callMethod("finish")
+                    }, 5000L)
+                }
+                else -> {
+                    val finder_account = mmkv?.callMethod("decodeString", "webview_key_user")
+                    LogUtil.e(WechatPlugins::class.java.name, "WebView finderAccount $finder_account")
+                    /*val js =
+                        "javascript:document.querySelector('.confirm .weui-btn.weui-btn_primary').click()"
+                    val js =
+                        "javascript:document.querySelectorAll('.multi-confirm .confirm-finder-list .confirm-item .confirm-name .name-content')"
+                    val js = "javascript:window.Android.showToast('Hello!')"
+                    val js =
+                        "javascript:document.querySelectorAll('.multi-confirm .confirm-finder-list .confirm-item .confirm-name .name-content').forEach(item => {\n" +
+                                "  if(item.innerText === '$finder_account'){\n" +
+                                "    item.click()\n" +
+                                "  }\n" +
+                                "})"*/
+                    val js =
+                        "document.querySelectorAll('.multi-confirm .confirm-finder-list .confirm-item .confirm-name .name-content').forEach(item => {\n" +
+                                "  if(item.innerText === '$finder_account'){\n" +
+                                "    item.scrollIntoView({\n" +
+                                "      behavior: \"smooth\",\n" +
+                                "      block:\"center\"\n" +
+                                "    })\n" +
+                                "    setTimeout(() => {\n" +
+                                "      item.click()\n" +
+                                "    }, 1000)\n" +
+                                "  }\n" +
+                                "})"
+                    LogUtil.e(WechatPlugins::class.java.name, "WebView js $js")
+                    ThreadUtil.runOnMainThread({
+                        /*val valueCallback2 = object :ValueCallback<String>{
+                            override fun onReceiveValue(args: String?) {
+                                LogUtil.e(WechatPlugins::class.java.name, "WebView ValueCallback2 args: ${args}")
+                            }
+
+                        }
+                        WebView.callMethod("addJavascriptInterface",WechatJavascriptInterface(),"Android")*/
+                        WebView.callMethod("evaluateJavascript", js, null)
+                        ThreadUtil.runOnMainThread({
+                            LogUtil.e(WechatPlugins::class.java.name, "WebViewUI finish")
+                            WebViewUI.callMethod("finish")
+                        }, 3000L)
+                    }, 3000L)
 
                 }
-                WebView.callMethod("addJavascriptInterface",WechatJavascriptInterface(),"Android")*/
-                WebView.callMethod("evaluateJavascript", js, null)
-                LogUtil.e(WechatPlugins::class.java.name, "WebView after evaluateJavascript")
-                ThreadUtil.runOnMainThread({
-                    LogUtil.e(WechatPlugins::class.java.name, "WebViewUI finish")
-                    WebViewUI.callMethod("finish")
-                }, 3000L)
-            }, 3000L)
+            }
+
 
         }
 
@@ -133,24 +147,32 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
         val uri = Uri.parse(url)
         val token = uri.getQueryParameter("token")
         val exportkey = uri.getQueryParameter("exportkey")
-        LogUtil.e(TAG, "WebView submitFinderAccount token: $token")
-        LogUtil.e(TAG, "WebView submitFinderAccount exportkey: $exportkey")
         val params = mutableMapOf(
             "token" to URLEncoder.encode(token,"UTF-8"),
             "exportKey" to URLEncoder.encode(exportkey,"UTF-8"),
             "exportkey" to URLEncoder.encode(exportkey,"UTF-8")
         )
         ThreadUtil.submitTask {
-            Thread.sleep(2000)
+            Thread.sleep(1000)
             val json = NetWorkUtil.postByUrlParams(Define.getFinderList(),params,"")
             val result = mGson.fromJson<TencentBaseResult<FinderList>>(
                 json.toString(),
                 genericType<TencentBaseResult<FinderList>>()
             )
             if (result.isSuccess) {
-
+                val alias = mmkv?.callMethod("decodeString", "webview_open_alias")?:""
+                val map = mutableMapOf(
+                    "accountList" to result.data.finderList,
+                    "deviceId" to alias
+                )
+                val uploadJson = NetWorkUtil.postJson(Define.uploadAccountList(),map)
+                val uploadResult = mGson.fromJson<BaseResult<UploadResponse>>(
+                    uploadJson.toString(),
+                    genericType<BaseResult<UploadResponse>>()
+                )
+                LogUtil.e(TAG,"upload result: ${uploadResult}")
             }
-            LogUtil.e(TAG,"result: ${result}")
+
         }
 
 
@@ -162,10 +184,12 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
         mActivityRef = WeakReference(activity)
     }
 
-    private fun openWebViewUI(url: String, account: String) {
+    private fun openWebViewUI(url: String, account: String,taskType:String,alias:String) {
         ThreadUtil.runOnMainThread {
             mmkv?.callMethod("putInt", webview_open_key, 0)
             mmkv?.callMethod("putString", finder_account_key, account)
+            mmkv?.callMethod("putString", webview_open_task, taskType)
+            mmkv?.callMethod("putString", webview_open_alias, alias)
             mmkv?.callMethod("apply")
             val intent = Intent()
 //        intent.putExtra("rawUrl", "https://channels.weixin.qq.com/mobile/confirm_login.html?token=${token}")
@@ -397,7 +421,8 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
 
     fun getLoginTask() {
         val params = mutableMapOf<String, String?>()
-        params["deviceId"] = getWechatAlias()
+        val wechatAlias = getWechatAlias()
+        params["deviceId"] = wechatAlias
         ThreadUtil.submitTask {
             Thread.sleep(200L)
             val json = NetWorkUtil.get(Define.getLoginTask(), params)
@@ -410,10 +435,12 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
             val scanQRLoginTask = response.data
             if (scanQRLoginTask != null) {
                 LogUtil.e(TAG, "getLoginTask response: $response")
-                LogUtil.e(TAG, "getLoginTask extra: ${scanQRLoginTask?.extra?.selectorName}")
                 val account =
                     URLDecoder.decode(scanQRLoginTask?.extra?.selectorName ?: "", "UTF-8")
-                openWebViewUI(scanQRLoginTask.qrcodeDecodeRaw ?: "", account)
+                val taskType = scanQRLoginTask.eventType ?:Define.TASK_SCAN_QR_CODE
+                openWebViewUI(scanQRLoginTask.qrcodeDecodeRaw ?: "", account,taskType,
+                    wechatAlias ?:""
+                )
                 //等待十秒检测是否还在授权页面
                 Thread.sleep(10000L)
                 val webViewOpen = mmkv?.callMethod("decodeInt", webview_open_key, 0)
@@ -422,7 +449,8 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
                     //webview打开但是没有回调，关闭重新打开
                     goBack()
                     Thread.sleep(2000L)
-                    openWebViewUI(scanQRLoginTask.qrcodeDecodeRaw ?: "", account)
+                    openWebViewUI(scanQRLoginTask.qrcodeDecodeRaw ?: "", account,taskType,
+                        wechatAlias ?:"")
                 }
             }
         }

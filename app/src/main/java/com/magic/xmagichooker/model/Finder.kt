@@ -22,3 +22,5 @@ data class Finder(
     val spamFlag: Int,
     val uniqId: String
 )
+
+data class UploadResponse(val finderList:List<Finder>,val acctStatus:Int)
