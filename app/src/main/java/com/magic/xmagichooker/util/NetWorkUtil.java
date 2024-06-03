@@ -387,7 +387,7 @@ public class NetWorkUtil {
     public static JSONObject postByUrlParams(String path, Object o, String mmDataPath) {
         String params = objectToGetString(o);
         LogUtil.INSTANCE.d(TAG, params);
-        HttpURLConnection conn = getHttpUrlConnection(path + "?" + params, HTTP_PARAMS.POST, mmDataPath);
+        HttpURLConnection conn = getHttpUrlConnection(path + "?" + params, HTTP_PARAMS.POST_JSON, mmDataPath);
         if (conn == null) {
             LogUtils.e(TAG, "网络错误 conn is null !!!");
             return null;
@@ -401,9 +401,9 @@ public class NetWorkUtil {
             if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_CREATED) {
                 InputStream in = conn.getInputStream();
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
-                byte[] bytes = new byte[1024];
+                byte[] bytes = new byte[1024 * 1024];
                 int len;
-                while ((len = in.read(bytes)) != -1) {
+                while ((len = in.read(bytes)) > 0) {
                     os.write(bytes, 0, len);
                 }
                 postRes = new String(os.toByteArray());
@@ -679,6 +679,7 @@ public class NetWorkUtil {
                     case POST_JSON:
                         conn.setDoOutput(true);
                         conn.setRequestMethod(http_params.method);
+                        conn.setRequestProperty("Connection", "Keep-Alive");
                         conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                         break;
                     case POST_FORM:
