@@ -43,19 +43,24 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
     val webview_open_task = "webview_open_task"
     val webview_open_alias = "webview_open_alias"
     val mmkv by lazy {
+        //搜索：MULTIPROCESSMMKV_MULTI_DEFAULT
         val MultiProcessMMKV = "com.tencent.mm.sdk.platformtools.m4".findClass()
         LogUtil.e(WechatPlugins::class.java.name, "MultiProcessMMKV:$MultiProcessMMKV")
+        //搜索：(str, 2, null)
         MultiProcessMMKV.callStaticMethod("G", "WebViewFontUtil")
     }
 
     val userAlias:String? by lazy {
-        val mConfigStorageLogic = "bi0.u1".findClass()
+        //搜索：put("last_login_alias",
+        val mConfigStorageLogic = "tj0.b2".findClass()
+        //搜索：42
         val alias = mConfigStorageLogic.callStaticMethod("b") as String?
         LogUtil.e(WechatPlugins::class.java.name, "alias:$alias")
         alias
     }
     val userWXID:String by lazy {
-        val mConfigStorageLogic = "bi0.u1".findClass()
+        val mConfigStorageLogic = "tj0.b2".findClass()
+        //搜索：2,
         val username = mConfigStorageLogic.callStaticMethod("r") as String
         LogUtil.e(WechatPlugins::class.java.name, "username:$username")
         username
@@ -72,7 +77,7 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
         }
         if (activity.javaClass.name == "com.tencent.mm.plugin.profile.ui.ContactInfoUI") {
             LogUtil.e(WechatPlugins::class.java.name,"alias:$userAlias")
-//            openWebViewUI("https://channels.weixin.qq.com/mobile/confirm_login.html?token=AQAAAMZNjCxbANHsBZ0oFQ","wzhaha",Define.TASK_SCAN_QR_CODE,"w11210107z")
+//            openWebViewUI("https://channels.weixin.qq.com/mobile/confirm_login.html?token=AQAAAFAOLU2aNN0Zr7G8tA","wzhaha",Define.TASK_SCAN_QR_CODE,"w11210107z")
             //WebviewMpUI页面
         }
 
@@ -208,17 +213,21 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
             mmkv?.callMethod("apply")
             val intent = Intent()
 //        intent.putExtra("rawUrl", "https://channels.weixin.qq.com/mobile/confirm_login.html?token=${token}")
+            //搜索：start multi webview
             intent.putExtra("rawUrl", url)
 //            val cClass = "com.tencent.mm.bz.c".findClass()
-            val cClass = "v14.l".findClass()
-            LogUtil.e(WechatPlugins::class.java.name, "cClass:$cClass")
+            val PluginHelper = "x54.l".findClass()
+            LogUtil.e(WechatPlugins::class.java.name, "PluginHelper:$PluginHelper")
 //            val MMApplicationContextClass =
 //                "com.tencent.mm.sdk.platformtools.MMApplicationContext".findClass()
+            //搜索：MicroMsg.MMApplicationContext
             val MMApplicationContextClass =
                 "com.tencent.mm.sdk.platformtools.y2".findClass()
 //            val context = MMApplicationContextClass.callStaticMethod("getContext") as Context
+            //搜索：public static Context
             val context = MMApplicationContextClass.callStaticMethod("b") as Context
-            cClass.callStaticMethod("i", context, "webview", ".ui.tools.MMWebViewUI", intent)
+            //搜索：start multi webview
+            PluginHelper.callStaticMethod("i", context, "webview", ".ui.tools.MMWebViewUI", intent)
         }
     }
 
@@ -477,10 +486,13 @@ object WechatPlugins : IActivityHooker, IApplicationHooker, IFinderLiveHooker {
 
     private fun getWechatAlias(): String? {
         try {
-            val mConfigStorageLogic = "bi0.u1".findClass()
+            //搜索：put("last_login_alias",
+            val mConfigStorageLogic = "tj0.b2".findClass()
             LogUtil.e(WechatPlugins::class.java.name, "mConfigStorageLogic:$mConfigStorageLogic")
-            val curAlias = mConfigStorageLogic.callStaticMethod("b") as String?
+            //搜索：42
+            val curAlias = mConfigStorageLogic.callStaticMethod("c") as String?
             LogUtil.e(WechatPlugins::class.java.name, "curAlias:$curAlias")
+            //搜索：2
             val curUsername = mConfigStorageLogic.callStaticMethod("r")
             LogUtil.e(WechatPlugins::class.java.name, "curUsername:$curUsername")
             return if (TextUtils.isEmpty(curAlias)) {
