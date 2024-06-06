@@ -5,9 +5,9 @@ import android.app.Application
 import android.content.Context
 import android.os.Process
 import android.text.TextUtils
-import android.util.Log
 import cc.sdkutil.controller.util.LogUtil
 import com.magic.kernel.MagicHooker
+import com.magic.kernel.core.Clazz
 import com.magic.kernel.helper.TryHelper.tryVerbosely
 import com.magic.shared.apis.SharedEngine
 import com.magic.wechat.apis.ByteDanceEngine
@@ -19,7 +19,6 @@ import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XC_MethodReplacement
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage
-import java.io.File
 
 
 class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
@@ -28,11 +27,12 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
     private val BYTE_DANCE_PACKAGE = "com.ss.android.ugc.aweme"
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
-        LogUtil.e(Hooker::class.java.name, "handleLoadPackage   ${lpparam.processName}")
+//        LogUtil.e(Hooker::class.java.name, "handleLoadPackage classLoader  ${lpparam.classLoader}")
+        LogUtil.e(Hooker::class.java.name, "handleLoadPackage processName  ${lpparam.processName}")
         tryVerbosely {
             when (lpparam.packageName) {
                 TARGET_PACKAGE ->
-                    hookAttachBaseContext(lpparam.classLoader) {
+                    hookAttachBaseContext(lpparam.classLoader) {it,classLoader->
                         hookLoadHooker(lpparam.classLoader)
                     }
                 BYTE_DANCE_PACKAGE ->
@@ -40,9 +40,13 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
 //
 //                    }
                     hookByteDance(lpparam)
-                else -> if (MagicHooker.isImportantWechatProcess(lpparam)) {
-                    hookAttachBaseContext(lpparam.classLoader) {
-                        hookTencent(lpparam, it)
+                else -> {
+                    val importantWechatProcess = MagicHooker.isImportantWechatProcess(lpparam)
+                    LogUtil.e(Hooker::class.java.name, "handleLoadPackage importantWechatProcess  ${importantWechatProcess}")
+                    if (importantWechatProcess) {
+                        hookAttachBaseContext(lpparam.classLoader) {it,classLoader->
+                            hookTencent(lpparam, it,classLoader)
+                        }
                     }
                 }
             }
@@ -53,8 +57,8 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
         LogUtil.e(Hooker::class.java.name, "initZygote   ${startupParam?.modulePath}   ${startupParam?.startsSystemServer}")
     }
 
-    private fun hookAttachBaseContext(classLoader: ClassLoader, callback: (Context) -> Unit) {
-        XposedHelpers.findAndHookMethod(
+    private fun hookAttachBaseContext(classLoader: ClassLoader, callback: (Context,ClassLoader) -> Unit) {
+        /*XposedHelpers.findAndHookMethod(
             "android.content.ContextWrapper",
             classLoader,
             "attachBaseContext",
@@ -64,7 +68,16 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
                     LogUtil.e(Hooker::class.java.name, "hookAttachBaseContext callback")
                     callback(param?.thisObject as? Application ?: return)
                 }
-            })
+            })*/
+        XposedHelpers.findAndHookMethod(Clazz.Application,"attach",Clazz.Context,object : XC_MethodHook() {
+            override fun afterHookedMethod(param: MethodHookParam?) {
+                LogUtil.e(Hooker::class.java.name, "hook attach callback")
+                val mContext = param!!.args[0] as Context
+//                LogUtil.e(Hooker::class.java.name, "mContext:$mContext")
+//                LogUtil.e(Hooker::class.java.name, "mContext:${mContext.classLoader}")
+                callback(param?.thisObject as? Application ?: return,mContext.classLoader)
+            }
+        })
     }
 
     private fun hookLoadHooker(classLoader: ClassLoader) {
@@ -75,7 +88,7 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
             })
     }
 
-    private fun hookTencent(lpparam: XC_LoadPackage.LoadPackageParam, context: Context) {
+    private fun hookTencent(lpparam: XC_LoadPackage.LoadPackageParam, context: Context,classLoader: ClassLoader) {
         LogUtil.e(Hooker::class.java.name, "lpparam.packageName:${lpparam.packageName}")
         LogUtil.e(Hooker::class.java.name, "lpparam.processName:${lpparam.processName}")
         when (lpparam.packageName) {
@@ -95,6 +108,7 @@ class Hooker : IXposedHookLoadPackage, IXposedHookZygoteInit {
                 }
                 MagicHooker.startup(
                     lpparam = lpparam,
+                    classLoader = classLoader,
                     plugins = listOf(WechatPlugins),
                     centers = WcEngine.hookerCenters + SharedEngine.hookerCenters
                 )

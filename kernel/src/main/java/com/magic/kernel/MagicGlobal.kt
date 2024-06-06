@@ -95,7 +95,7 @@ object MagicGlobal {
     }
 
     @JvmStatic
-    fun init(lpparam: XC_LoadPackage.LoadPackageParam, callback: (Boolean) -> Unit) {
+    fun init(lpparam: XC_LoadPackage.LoadPackageParam,loader: ClassLoader?, callback: (Boolean) -> Unit) {
         TryHelper.tryAsynchronously {
             if (initChannel.isDone()) {
                 return@tryAsynchronously
@@ -105,7 +105,9 @@ object MagicGlobal {
                 version = MagicHooker.getApplicationVersion(lpparam.packageName)
                 packageName = lpparam.packageName
                 classLoader = lpparam.classLoader
-
+                loader?.let {
+                    classLoader = it
+                }
                 LogUtil.e(
                     MagicGlobal::class.java.name,
                     "init  ${lpparam.appInfo.sourceDir}     ${lpparam.appInfo.publicSourceDir}  \n${version}   ${packageName}  ${classLoader}"

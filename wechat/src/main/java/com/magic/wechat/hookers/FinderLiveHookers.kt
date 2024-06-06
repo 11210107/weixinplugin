@@ -128,7 +128,7 @@ object FinderLiveHookers:HookerCenter() {
             "onPageFinished" ->
                 iMethodNotifyHooker(
                     clazz = "com.tencent.mm.plugin.webview.ui.tools.WebViewUI".findClass(),
-                    method = "b",
+                    method = "x7",
                     iClazz = IFinderLiveHooker::class.java,
                     iMethodBefore = "onPageFinished",
                     needObject = true,

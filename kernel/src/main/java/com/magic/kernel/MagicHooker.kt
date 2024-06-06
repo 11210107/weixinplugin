@@ -70,9 +70,10 @@ object MagicHooker {
             ?: throw Error("Failed to get the version of $packageName"))
     }
 
-    fun startup(lpparam: XC_LoadPackage.LoadPackageParam, plugins: List<Any>?, centers: List<HookerCenter>) {
+    fun startup(lpparam: XC_LoadPackage.LoadPackageParam, classLoader: ClassLoader? = null,plugins: List<Any>?, centers: List<HookerCenter>) {
         XposedBridge.log("Wechat XMagicHooker: ${plugins?.size ?: 0} plugins.")
-        MagicGlobal.init(lpparam) {
+        XposedBridge.log("Wechat XMagicHooker: ${lpparam.classLoader}")
+        MagicGlobal.init(lpparam,classLoader) {
             when (it) {
                 true -> {
                     registerPlugins(plugins, centers)
