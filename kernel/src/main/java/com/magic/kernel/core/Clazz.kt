@@ -1,5 +1,6 @@
 package com.magic.kernel.core
 
+import android.app.Application
 import android.webkit.ValueCallback
 import org.json.JSONObject
 
@@ -21,6 +22,7 @@ object Clazz {
     val Throwable = Throwable::class.java
 
     val Activity = android.app.Activity::class.java
+    val Application = android.app.Application::class.java
     val Fragment = androidx.fragment.app.Fragment::class.java
     val AdapterView = android.widget.AdapterView::class.java
     val AdapterView_OnItemClickListener = android.widget.AdapterView.OnItemClickListener::class.java
