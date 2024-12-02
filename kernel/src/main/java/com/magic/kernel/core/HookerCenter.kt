@@ -214,7 +214,7 @@ abstract class HookerCenter : IHookerProvider {
         action: (Any) -> Operation<*>
     ) {
         val operations = notifyForResults(event, action)
-        val result = operations.filter { it.returnEarly }.maxBy { it.priority }
+        val result = operations.filter { it.returnEarly }.maxByOrNull { it.priority }
         if (result != null) {
             if (result.value != null) {
                 param.result = result.value
